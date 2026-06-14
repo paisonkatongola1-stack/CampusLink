@@ -1,0 +1,35 @@
+mutation CreateUserProfile($email: String!, $displayName: String, $role: String!) {
+  user_insert(data: {
+    email: $email,
+    displayName: $displayName,
+    role: $role
+  })
+}
+
+mutation UpdateUserProfile($id: String!, $displayName: String, $university: String, $course: String, $year: String, $bio: String) {
+  user_update(id: $id, data: {
+    displayName: $displayName,
+    university: $university,
+    course: $course,
+    year: $year,
+    bio: $bio
+  })
+}
+
+mutation PostMarketplaceItem($title: String!, $price: String!, $location: String!, $category: String!, $image: String!, $sellerId: String!) {
+  marketplaceItem_insert(data: {
+    title: $title,
+    price: $price,
+    location: $location,
+    category: $category,
+    image: $image,
+    sellerId: $sellerId
+  })
+}
+
+mutation SubmitApplication($jobId: UUID!, $applicantId: String!) {
+  application_insert(data: {
+    jobId: $jobId,
+    applicantId: $applicantId
+  })
+}

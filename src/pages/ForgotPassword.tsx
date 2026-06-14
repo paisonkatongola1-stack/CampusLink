@@ -45,7 +45,7 @@ export default function ForgotPassword() {
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-gray-400">Email Address</label>
                                 <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} strokeWidth={2.5} />
                                     <input
                                         type="email"
                                         placeholder="name@university.zm"
@@ -67,7 +67,7 @@ export default function ForgotPassword() {
                 ) : (
                     <div className="text-center py-6">
                         <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle2 size={40} />
+                            <CheckCircle2 size={40} strokeWidth={2.5} />
                         </div>
                         <h2 className="text-2xl font-bold mb-2">Check Your Email</h2>
                         <p className="text-gray-400 mb-8">We've sent a password reset link to <span className="text-white font-medium">{email}</span></p>

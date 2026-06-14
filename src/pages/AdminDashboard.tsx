@@ -1,87 +1,124 @@
 import { motion } from 'framer-motion';
 import {
   Shield, Users, Layout, Activity,
-  CheckCircle, AlertCircle, TrendingUp, DollarSign
+  CheckCircle, AlertCircle, TrendingUp, DollarSign,
+  ArrowUpRight, Settings
 } from 'lucide-react';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 
 const AdminDashboard = () => {
+  const stats = [
+    { label: "Total Users", val: "10,248", icon: <Users size={24} strokeWidth={2.5} />, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { label: "Total Listings", val: "1,245", icon: <Layout size={24} strokeWidth={2.5} />, color: "text-purple-500", bg: "bg-purple-500/10" },
+    { label: "Revenue (MTD)", val: "K45,800", icon: <DollarSign size={24} strokeWidth={2.5} />, color: "text-green-500", bg: "bg-green-500/10" },
+    { label: "System Health", val: "99.9%", icon: <Activity size={24} strokeWidth={2.5} />, color: "text-accent", bg: "bg-accent/10" },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#05060B] p-6 lg:p-10 pt-24">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen bg-[#05060B] p-6 lg:p-12 pt-28"
+    >
       <div className="max-w-7xl mx-auto">
-        <header className="mb-10">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="p-2 bg-accent/20 text-accent rounded-lg"><Shield size={20} /></div>
-            <h1 className="text-3xl font-bold tracking-tight">System Administration</h1>
-          </div>
-          <p className="text-gray-500">Platform-wide overview and moderation hub</p>
+        <header className="flex flex-col md:flex-row md:items-center justify-between mb-16 space-y-6 md:space-y-0">
+          <motion.div variants={fadeInUp}>
+            <div className="flex items-center space-x-4 mb-3">
+              <div className="p-3 bg-accent/20 text-accent rounded-2xl shadow-xl shadow-accent/10 border border-accent/20">
+                <Shield size={24} strokeWidth={2.5} />
+              </div>
+              <h1 className="text-4xl font-black tracking-tight uppercase">Control <span className="text-primary italic">Center</span></h1>
+            </div>
+            <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-[10px]">Platform-wide administrative authority</p>
+          </motion.div>
+          <motion.div variants={fadeInUp} className="flex space-x-3">
+             <Button variant="glass" size="md" className="border-white/5">
+                <Settings size={18} strokeWidth={2.5} className="mr-2" /> Settings
+             </Button>
+             <Button variant="primary" size="md">
+                View Logs <ArrowUpRight size={18} strokeWidth={3} className="ml-2" />
+             </Button>
+          </motion.div>
         </header>
 
-        <div className="grid md:grid-cols-4 gap-6 mb-10">
-           {[
-             { label: "Total Users", val: "10,248", icon: <Users />, color: "text-blue-500" },
-             { label: "Total Listings", val: "1,245", icon: <Layout />, color: "text-purple-500" },
-             { label: "Revenue (MTD)", val: "K45,800", icon: <DollarSign />, color: "text-green-500" },
-             { label: "System Health", val: "99.9%", icon: <Activity />, color: "text-accent" },
-           ].map((s, i) => (
-             <div key={i} className="glass p-6 rounded-3xl border border-white/5">
-               <div className={`${s.color} mb-4`}>{s.icon}</div>
-               <div className="text-2xl font-black">{s.val}</div>
-               <div className="text-xs text-gray-500 uppercase tracking-widest">{s.label}</div>
-             </div>
+        <motion.div variants={staggerContainer} className="grid md:grid-cols-4 gap-8 mb-16">
+           {stats.map((s, i) => (
+             <motion.div key={i} variants={scaleUp}>
+               <Card className="p-10 group relative overflow-hidden" hoverable={true}>
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/2 blur-3xl rounded-full" />
+                 <div className={`${s.color} ${s.bg} p-4 rounded-2xl inline-flex mb-8 border border-white/5 shadow-2xl group-hover:scale-110 transition-transform duration-500`}>
+                   {s.icon}
+                 </div>
+                 <div className="text-4xl font-black tracking-tighter mb-2">{s.val}</div>
+                 <div className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">{s.label}</div>
+               </Card>
+             </motion.div>
            ))}
-        </div>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-10">
-           <div className="space-y-6">
-              <h3 className="text-xl font-bold flex items-center">
-                <AlertCircle size={20} className="mr-2 text-yellow-500" /> Pending Approvals
+        <div className="grid lg:grid-cols-2 gap-12">
+           <motion.div variants={fadeInUp} className="space-y-8">
+              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 flex items-center ml-2">
+                <AlertCircle size={16} strokeWidth={3} className="mr-3 text-yellow-500" /> Pending Approvals
               </h3>
-              <div className="glass overflow-hidden rounded-3xl border border-white/5">
-                 <div className="flex border-b border-white/5">
+              <div className="glass overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl relative">
+                 <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
+                 <div className="flex border-b border-white/5 bg-white/2">
                     {['Accommodation', 'Marketplace', 'Events'].map((tab, i) => (
-                      <button key={tab} className={`flex-1 py-4 text-xs font-bold uppercase tracking-wider ${i === 0 ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-white transition-all'}`}>
+                      <button key={tab} className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-600 hover:text-white'}`}>
                         {tab}
                       </button>
                     ))}
                  </div>
-                 <div className="p-6 space-y-4">
+                 <div className="p-8 space-y-6">
                     {[
                       { title: "Riverside Shared Room", user: "Landlord: John B.", type: "New Listing" },
                       { title: "Zambia Tech Expo", user: "Organizer: ICT Union", type: "Event" },
-                      { title: "HP Laptop for sale", user: "Student: Mwaka M.", type: "Marketplace" }
+                      { title: "HP Laptop G8 Pro", user: "Student: Mwaka M.", type: "Marketplace" }
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div key={i} className="flex items-center justify-between p-5 bg-white/3 rounded-[1.5rem] border border-white/5 hover:border-primary/20 transition-all group">
                         <div>
-                          <div className="font-bold text-sm">{item.title}</div>
-                          <div className="text-[10px] text-gray-400">{item.user}</div>
+                          <div className="font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
+                          <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{item.user}</div>
                         </div>
-                        <div className="flex space-x-2">
-                           <button className="p-2 bg-green-500/20 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={16} /></button>
-                           <button className="p-2 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"><AlertCircle size={16} /></button>
+                        <div className="flex space-x-3">
+                           <button className="p-3 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/10"><CheckCircle size={18} strokeWidth={2.5} /></button>
+                           <button className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"><AlertCircle size={18} strokeWidth={2.5} /></button>
                         </div>
                       </div>
                     ))}
                  </div>
               </div>
-           </div>
+           </motion.div>
 
-           <div className="space-y-6">
-              <h3 className="text-xl font-bold flex items-center">
-                <TrendingUp size={20} className="mr-2 text-primary" /> Growth Analytics
+           <motion.div variants={fadeInUp} className="space-y-8">
+              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 flex items-center ml-2">
+                <TrendingUp size={16} strokeWidth={3} className="mr-3 text-primary" /> Growth Analytics
               </h3>
-              <div className="glass p-8 rounded-3xl border border-white/5 h-[400px] flex items-center justify-center relative overflow-hidden">
-                 {/* Placeholder for chart */}
-                 <div className="absolute inset-0 opacity-20 flex items-end">
-                    {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
-                      <div key={i} style={{ height: `${h}%` }} className="flex-1 bg-gradient-to-t from-primary to-transparent mx-1 rounded-t-lg" />
+              <Card className="p-10 h-[450px] flex items-center justify-center relative overflow-hidden" hoverable={false}>
+                 {/* Visualized growth bars */}
+                 <div className="absolute inset-x-10 bottom-10 h-64 flex items-end justify-between space-x-2">
+                    {[40, 60, 45, 90, 65, 80, 100, 75, 85, 95].map((h, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ height: 0 }}
+                        animate={{ height: `${h}%` }}
+                        transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
+                        className="flex-1 bg-gradient-to-t from-primary/40 to-primary rounded-t-xl shadow-lg shadow-primary/10"
+                      />
                     ))}
                  </div>
-                 <p className="text-gray-500 font-bold z-10 text-center">Interactive Growth Charts<br /><span className="text-xs font-normal">Real-time user engagement data</span></p>
-              </div>
-           </div>
+                 <div className="z-10 text-center bg-black/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
+                    <p className="text-white font-black text-lg tracking-tight uppercase italic mb-1">User Engagement</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Real-time growth metrics</p>
+                 </div>
+              </Card>
+           </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
