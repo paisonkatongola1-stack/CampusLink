@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
 // Pages
@@ -34,41 +33,19 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
 
-              {/* Protected Routes - General */}
-              <Route path="/accommodation" element={<ProtectedRoute><Accommodation /></ProtectedRoute>} />
-              <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
-              <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
-              <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-              <Route path="/businesses" element={<ProtectedRoute><Services /></ProtectedRoute>} />
-              <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              {/* Demo Routes - No Protection for Video */}
+              <Route path="/accommodation" element={<Accommodation />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/businesses" element={<Services />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/profile" element={<Profile />} />
 
-              {/* Role-Based Protected Routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute allowedRoles={['student']}>
-                    <StudentDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/business-dashboard"
-                element={
-                  <ProtectedRoute allowedRoles={['business']}>
-                    <BusinessDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin-dashboard"
-                element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/dashboard" element={<StudentDashboard />} />
+              <Route path="/business-dashboard" element={<BusinessDashboard />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
