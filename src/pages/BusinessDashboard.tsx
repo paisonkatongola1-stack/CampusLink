@@ -8,8 +8,15 @@ import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Sidebar } from '../components/ui/Sidebar';
+import { Modal } from '../components/ui/Modal';
+import { Input } from '../components/ui/Input';
+import { useState } from 'react';
 
 const BusinessDashboard = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formType, setFormType] = useState<'job' | 'listing'>('job');
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const stats = [
     { label: "Total Views", value: "12.4k", icon: <Eye size={22} strokeWidth={2.5} className="text-blue-500" />, trend: "+12%" },
     { label: "Inquiries", value: "48", icon: <MessageCircle size={22} strokeWidth={2.5} className="text-green-500" />, trend: "+5%" },
@@ -27,6 +34,17 @@ const BusinessDashboard = () => {
     { icon: <Settings size={20} strokeWidth={2.5} />, label: "Settings", href: "/settings" },
   ];
 
+  const handleOpenModal = (type: 'job' | 'listing') => {
+    setFormType(type);
+    setIsModalOpen(true);
+    setIsSuccess(false);
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSuccess(true);
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -35,15 +53,28 @@ const BusinessDashboard = () => {
     >
       <Sidebar items={sidebarItems} />
 
-      <main className="flex-1 p-6 lg:p-10">
+      <main className="flex-1 p-6 lg:p-10 pt-28">
         <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
           <motion.div variants={fadeInUp}>
             <h1 className="text-3xl font-black tracking-tight uppercase italic">Business <span className="text-primary italic-none">Hub</span></h1>
             <p className="text-gray-500 font-black uppercase tracking-[0.2em] text-[10px]">Manage your ecosystem presence</p>
           </motion.div>
-          <motion.button {...hoverScale} className="flex items-center px-8 py-4 bg-primary rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
-            <Plus size={18} strokeWidth={3} className="mr-2" /> Post New
-          </motion.button>
+          <div className="flex space-x-3">
+             <motion.button
+               onClick={() => handleOpenModal('listing')}
+               {...hoverScale}
+               className="flex items-center px-6 py-3 glass border-white/5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-white/5 transition-all"
+             >
+               Add Listing
+             </motion.button>
+             <motion.button
+               onClick={() => handleOpenModal('job')}
+               {...hoverScale}
+               className="flex items-center px-8 py-3 bg-primary rounded-xl font-black text-xs uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20"
+             >
+               <Plus size={18} strokeWidth={3} className="mr-2" /> Post Job
+             </motion.button>
+          </div>
         </header>
 
         <motion.div variants={staggerContainer} className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -108,18 +139,41 @@ const BusinessDashboard = () => {
                       <div className="font-bold text-sm mb-3 tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center text-[10px] font-black text-gray-600 uppercase tracking-widest">
-                          <Eye size={12} className="mr-1.5" /> {item.views}
+                          <Eye size={12} strokeWidth={2.5} className="mr-1.5" /> {item.views}
                         </div>
                         <span className={`font-black text-base tracking-tighter ${item.color}`}>{item.price}</span>
                       </div>
                    </Card>
                  ))}
-                 <button className="w-full py-6 border-2 border-dashed border-white/5 rounded-3xl text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary/40 hover:text-primary transition-all">
+                 <button onClick={() => handleOpenModal('listing')} className="w-full py-6 border-2 border-dashed border-white/5 rounded-3xl text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary/40 hover:text-primary transition-all">
                    + Create New Listing
                  </button>
               </div>
            </motion.div>
         </div>
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title={formType === 'job' ? "Post New Job" : "Add Marketplace Listing"}
+          isSuccess={isSuccess}
+          successMessage={formType === 'job' ? "Your job opening has been published to the student hub." : "Your item is now live on the marketplace."}
+        >
+          <form className="space-y-6" onSubmit={handleFormSubmit}>
+             <Input label={formType === 'job' ? "Role Title" : "Product Name"} placeholder={formType === 'job' ? "e.g. Frontend Intern" : "e.g. iPhone 13"} required />
+             <div className="grid grid-cols-2 gap-4">
+                <Input label={formType === 'job' ? "Salary Range" : "Price (ZMW)"} placeholder="e.g. K5,000" required />
+                <Input label="Location" placeholder="e.g. Lusaka" required />
+             </div>
+             {formType === 'job' && (
+               <Input label="Requirements" placeholder="e.g. React, Node.js" />
+             )}
+             <Input label="Description" placeholder="Tell us more about this opportunity..." className="h-24" />
+             <Button type="submit" className="w-full uppercase tracking-widest text-[10px] py-5">
+               {formType === 'job' ? "Publish Opportunity" : "Post Listing"}
+             </Button>
+          </form>
+        </Modal>
       </main>
     </motion.div>
   );

@@ -1,8 +1,9 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
+import { CampusSwitcher } from './CampusSwitcher';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
@@ -37,7 +38,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-4 shadow-2xl">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-black text-white tracking-tighter italic flex items-center">
+        <Link to="/" className="text-2xl font-black text-white tracking-tighter italic flex items-center mr-4">
           Campus<span className="text-primary italic-none ml-0.5">Link</span>
         </Link>
 
@@ -64,6 +65,7 @@ const Navbar = () => {
                 <LayoutDashboard size={14} strokeWidth={2.5} />
                 <span>Panel</span>
               </Link>
+              <CampusSwitcher />
               <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 transition-colors p-2">
                 <LogOut size={18} strokeWidth={2.5} />
               </button>

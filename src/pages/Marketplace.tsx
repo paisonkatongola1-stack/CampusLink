@@ -1,14 +1,17 @@
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, MapPin, Star, Plus, Tag } from 'lucide-react';
+import { Search, ShoppingCart, MapPin, Star, Plus } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { MarketplaceItem } from '../types';
 import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import { useState, useMemo } from 'react';
 
 const Marketplace = () => {
   const { data } = useCollection<MarketplaceItem>('marketplace');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All Items");
 
   const mockItems: MarketplaceItem[] = [
     { id: '1', title: "MacBook Pro M1 2020", price: "K15,000", location: "UNZA", rating: 4.8, category: "Electronics", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80", sellerId: 'user1' },
@@ -17,7 +20,15 @@ const Marketplace = () => {
     { id: '4', title: "Scientific Calculator CASIO", price: "K350", location: "UNZA", rating: 4.9, category: "Electronics", image: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=800&q=80", sellerId: 'user4' },
   ];
 
-  const items = data.length > 0 ? data : mockItems;
+  const rawItems = data.length > 0 ? data : mockItems;
+
+  const filteredItems = useMemo(() => {
+    return rawItems.filter(item => {
+      const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = activeCategory === "All Items" || item.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [rawItems, searchTerm, activeCategory]);
 
   return (
     <motion.div
@@ -35,6 +46,8 @@ const Marketplace = () => {
              placeholder="Search for items..."
              icon={<Search size={20} strokeWidth={2.5} />}
              className="md:w-80 shadow-2xl"
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
            />
            <Button variant="primary" className="p-4 rounded-2xl shadow-primary/30">
               <ShoppingCart size={22} strokeWidth={2.5} />
@@ -43,8 +56,12 @@ const Marketplace = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-12 overflow-x-auto pb-4 no-scrollbar">
-        {['All Items', 'Electronics', 'Books', 'Furniture', 'Fashion', 'Services'].map((cat, i) => (
-          <button key={i} className={`px-8 py-3 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:border-primary/40 hover:text-white'}`}>
+        {['All Items', 'Electronics', 'Books', 'Furniture'].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`px-8 py-3 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeCategory === cat ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:border-primary/40 hover:text-white'}`}
+          >
             {cat}
           </button>
         ))}
@@ -54,10 +71,11 @@ const Marketplace = () => {
         variants={staggerContainer}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
       >
-        {items.map((item, i) => (
+        {filteredItems.length > 0 ? filteredItems.map((item, i) => (
           <motion.div
             key={item.id}
             variants={fadeInUp}
+            layout
           >
             <Card className="h-full flex flex-col group relative overflow-hidden" hoverable={true}>
               <div className="relative aspect-[4/5] overflow-hidden bg-white/5">
@@ -66,9 +84,6 @@ const Marketplace = () => {
                 <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-[0.2em] border border-white/10 z-10">
                   {item.category}
                 </div>
-                <button className="absolute top-4 right-4 p-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-primary z-10">
-                   <Plus size={16} strokeWidth={3} />
-                </button>
               </div>
               <div className="p-6 flex-1 flex flex-col relative">
                 <h3 className="font-bold text-base mb-1 tracking-tight truncate">{item.title}</h3>
@@ -89,7 +104,11 @@ const Marketplace = () => {
               </div>
             </Card>
           </motion.div>
-        ))}
+        )) : (
+          <div className="col-span-full py-20 text-center glass rounded-[2.5rem] border-dashed border-white/10">
+             <p className="text-gray-500 font-bold uppercase tracking-widest">No items found in this category</p>
+          </div>
+        )}
       </motion.div>
 
       <motion.button

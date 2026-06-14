@@ -6,9 +6,22 @@ import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { AccommodationListing } from '../types';
 import { fadeInUp, staggerContainer } from '../utils/animations';
+import { useState, useMemo, useEffect } from 'react';
+import { useCampus } from '../context/CampusContext';
 
 const Accommodation = () => {
   const { data } = useCollection<AccommodationListing>('accommodation');
+  const { selectedCampus } = useCampus();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  useEffect(() => {
+    if (selectedCampus !== 'All') {
+      setActiveFilter(`${selectedCampus} Area`);
+    } else {
+      setActiveFilter("All");
+    }
+  }, [selectedCampus]);
 
   const mockListings: AccommodationListing[] = [
     {
@@ -33,11 +46,36 @@ const Accommodation = () => {
       landlordId: 'l2',
       university: 'CBU'
     },
+    {
+      id: '3',
+      title: "Mulungushi Shared Villa",
+      price: "K1,500",
+      distance: "2km from Mulungushi",
+      location: "Kabwe",
+      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+      amenities: ['water', 'security'],
+      landlordId: 'l3',
+      university: 'Mulungushi'
+    }
   ];
 
-  const listings = data.length > 0 ? data : mockListings;
+  const rawListings = data.length > 0 ? data : mockListings;
 
-  const amenityIcons: any = {
+  const filteredListings = useMemo(() => {
+    return rawListings.filter(item => {
+      const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.location.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesFilter = activeFilter === "All" ||
+                           (activeFilter === "UNZA Area" && item.university === "UNZA") ||
+                           (activeFilter === "CBU Area" && item.university === "CBU") ||
+                           (activeFilter === "Under K3,000" && parseInt(item.price.replace(/\D/g, '')) < 3000);
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [rawListings, searchTerm, activeFilter]);
+
+  const amenityIcons: Record<string, React.ReactNode> = {
     wifi: <Wifi size={14} strokeWidth={2.5} />,
     power: <Zap size={14} strokeWidth={2.5} />,
     security: <ShieldCheck size={14} strokeWidth={2.5} />,
@@ -60,6 +98,8 @@ const Accommodation = () => {
              placeholder="Search location or university..."
              icon={<Search size={20} strokeWidth={2.5} />}
              className="md:w-80 shadow-2xl"
+             value={searchTerm}
+             onChange={(e) => setSearchTerm(e.target.value)}
            />
            <Button variant="glass" className="p-3.5">
               <Filter size={20} strokeWidth={2.5} />
@@ -68,8 +108,12 @@ const Accommodation = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
-        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter, i) => (
-          <button key={i} className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}>
+        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area'].map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeFilter === filter ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}
+          >
             {filter}
           </button>
         ))}
@@ -79,10 +123,11 @@ const Accommodation = () => {
         variants={staggerContainer}
         className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
       >
-        {listings.map((item, i) => (
+        {filteredListings.length > 0 ? filteredListings.map((item, i) => (
           <motion.div
             key={item.id}
             variants={fadeInUp}
+            layout
           >
             <Card className="p-0 group relative overflow-hidden" hoverable={true}>
               <div className="relative h-72 overflow-hidden bg-white/5">
@@ -110,7 +155,11 @@ const Accommodation = () => {
               </div>
             </Card>
           </motion.div>
-        ))}
+        )) : (
+          <div className="col-span-full py-20 text-center glass rounded-[2.5rem] border-dashed border-white/10">
+             <p className="text-gray-500 font-bold uppercase tracking-widest">No listings found matching your criteria</p>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );
