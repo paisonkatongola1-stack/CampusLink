@@ -1,6 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { AnimatePresence } from "framer-motion";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -19,37 +22,45 @@ import Profile from "./pages/Profile";
 import Services from "./pages/Services";
 import Messages from "./pages/Messages";
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-secondary text-white selection:bg-primary/30">
+        <ScrollToTop />
+        <div className="min-h-screen bg-[#0A0B14] text-white selection:bg-primary/30 overflow-x-hidden font-sans text-xs">
           <Navbar />
           <div className="pt-20">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
 
-              {/* Demo Routes - No Protection for Video */}
-              <Route path="/accommodation" element={<Accommodation />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/jobs" element={<Jobs />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/businesses" element={<Services />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/profile" element={<Profile />} />
+                <Route path="/accommodation" element={<ProtectedRoute><Accommodation /></ProtectedRoute>} />
+                <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+                <Route path="/jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
+                <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+                <Route path="/businesses" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+                <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+                <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-              <Route path="/dashboard" element={<StudentDashboard />} />
-              <Route path="/business-dashboard" element={<BusinessDashboard />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+                <Route path="/business-dashboard" element={<ProtectedRoute allowedRoles={['business']}><BusinessDashboard /></ProtectedRoute>} />
+                <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AnimatePresence>
           </div>
         </div>
       </BrowserRouter>

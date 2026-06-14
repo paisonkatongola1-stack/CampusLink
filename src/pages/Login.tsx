@@ -3,10 +3,11 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 
 import { auth } from "../firebase";
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import { Mail, Lock, LogIn, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
+import { fadeInUp, scaleUp, hoverScale } from '../utils/animations';
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -43,79 +44,91 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-[90vh] flex items-center justify-center px-6 py-12">
+        <div className="min-h-[90vh] flex items-center justify-center px-6 py-12 relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md"
+                initial="hidden"
+                animate="visible"
+                variants={scaleUp}
+                className="w-full max-w-md relative z-10"
             >
-                <Card className="p-10" hoverable={false}>
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-bold mb-2">Welcome Back</h2>
-                        <p className="text-gray-400 text-sm font-medium uppercase tracking-widest">Access your dashboard</p>
+                <Card className="p-12 shadow-2xl border-white/5" hoverable={false}>
+                    <div className="text-center mb-12">
+                        <motion.div variants={fadeInUp} className="inline-flex p-3 bg-primary/10 text-primary rounded-2xl mb-6 shadow-xl shadow-primary/5">
+                           <Sparkles size={28} strokeWidth={2.5} />
+                        </motion.div>
+                        <motion.h2 variants={fadeInUp} className="text-4xl font-black mb-3 tracking-tight italic">Welcome <span className="text-primary italic-none">Back</span></motion.h2>
+                        <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em]">Access your student portal</motion.p>
                     </div>
 
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-6 text-sm flex items-center">
-                            <span className="w-2 h-2 bg-red-500 rounded-full mr-3 animate-pulse" />
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 border border-red-500/20 text-red-500 p-5 rounded-2xl mb-8 text-xs font-bold flex items-center">
+                            <span className="w-2 h-2 bg-red-500 rounded-full mr-4 animate-pulse" />
                             {error}
-                        </div>
+                        </motion.div>
                     )}
 
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <Input
-                            label="Email Address"
-                            type="email"
-                            placeholder="name@university.zm"
-                            icon={<Mail size={18} />}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                    <form onSubmit={handleLogin} className="space-y-8">
+                        <motion.div variants={fadeInUp} transition={{ delay: 0.1 }}>
+                          <Input
+                              label="Institutional Email"
+                              type="email"
+                              placeholder="name@university.zm"
+                              icon={<Mail size={20} strokeWidth={2.5} />}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                          />
+                        </motion.div>
 
-                        <div className="space-y-1">
+                        <motion.div variants={fadeInUp} transition={{ delay: 0.2 }} className="space-y-3">
                             <Input
-                                label="Password"
+                                label="Secure Password"
                                 type="password"
                                 placeholder="••••••••"
-                                icon={<Lock size={18} />}
+                                icon={<Lock size={20} strokeWidth={2.5} />}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
-                            <div className="flex justify-end">
-                                <Link to="/forgot-password" size="sm" className="text-xs text-primary hover:underline font-medium uppercase tracking-tighter">Forgot Password?</Link>
+                            <div className="flex justify-end px-1">
+                                <Link to="/forgot-password" size="sm" className="text-[10px] text-primary hover:text-white transition-colors font-black uppercase tracking-widest underline decoration-primary/30 underline-offset-4">Lost access?</Link>
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            isLoading={loading}
-                            size="lg"
-                        >
-                            <LogIn size={20} className="mr-2" /> Login
-                        </Button>
+                        <motion.div variants={fadeInUp} transition={{ delay: 0.3 }}>
+                          <Button
+                              type="submit"
+                              className="w-full py-5 text-[10px] uppercase tracking-[0.2em]"
+                              isLoading={loading}
+                              size="lg"
+                          >
+                              <LogIn size={20} strokeWidth={2.5} className="mr-3" /> Secure Login
+                          </Button>
+                        </motion.div>
                     </form>
 
-                    <div className="mt-8">
-                        <div className="relative flex items-center justify-center mb-6">
+                    <div className="mt-12">
+                        <div className="relative flex items-center justify-center mb-8">
                             <div className="border-t border-white/5 w-full" />
-                            <span className="absolute bg-[#0A0B14] px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Or continue with</span>
+                            <span className="absolute bg-[#0F111A] px-5 text-[9px] font-black text-gray-600 uppercase tracking-[0.3em]">Identity Hub</span>
                         </div>
 
-                        <Button
-                            type="button"
-                            onClick={handleGoogleLogin}
-                            variant="secondary"
-                            className="w-full"
-                            disabled={loading}
-                        >
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5 mr-3" alt="Google" />
-                            Google Account
-                        </Button>
+                        <motion.div variants={fadeInUp} transition={{ delay: 0.4 }}>
+                          <Button
+                              type="button"
+                              onClick={handleGoogleLogin}
+                              variant="secondary"
+                              className="w-full border-white/10 hover:border-primary/40 py-4 text-[10px] uppercase tracking-[0.2em]"
+                              disabled={loading}
+                          >
+                              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5 mr-4" alt="Google" />
+                              Continue with Google
+                          </Button>
+                        </motion.div>
                     </div>
 
-                    <p className="mt-8 text-center text-gray-400 text-sm">
-                        Don't have an account? <Link to="/signup" className="text-primary font-bold hover:underline">Sign Up</Link>
+                    <p className="mt-10 text-center text-gray-500 text-xs font-bold">
+                        New to CampusLink? <Link to="/signup" className="text-primary font-black hover:text-white transition-colors ml-2 uppercase tracking-widest underline underline-offset-4">Create Account</Link>
                     </p>
                 </Card>
             </motion.div>
