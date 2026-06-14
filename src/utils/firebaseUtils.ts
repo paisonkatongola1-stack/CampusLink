@@ -8,26 +8,28 @@ import {
   doc,
   setDoc,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  Timestamp
 } from "firebase/firestore";
 import { auth } from "../firebase";
+import { UserProfile, AccommodationListing, JobListing, MarketplaceItem } from "../types";
 
 const db = getFirestore();
 
-export const createUserProfile = async (userId: string, data: any) => {
+export const createUserProfile = async (userId: string, data: Partial<UserProfile>) => {
   return await setDoc(doc(db, "users", userId), data);
 };
 
-export const getAccommodations = async () => {
+export const getAccommodations = async (): Promise<AccommodationListing[]> => {
   const querySnapshot = await getDocs(collection(db, "accommodation"));
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AccommodationListing));
 };
 
-export const postMarketplaceItem = async (data: any) => {
+export const postMarketplaceItem = async (data: Partial<MarketplaceItem>) => {
   return await addDoc(collection(db, "marketplace"), {
     ...data,
     sellerId: auth.currentUser?.uid,
-    createdAt: new Date()
+    createdAt: Timestamp.now()
   });
 };
 
@@ -37,7 +39,7 @@ export const applyForJob = async (jobId: string, applicantData: any) => {
     applicantId: auth.currentUser?.uid,
     ...applicantData,
     status: "pending",
-    appliedAt: new Date()
+    appliedAt: Timestamp.now()
   });
 };
 

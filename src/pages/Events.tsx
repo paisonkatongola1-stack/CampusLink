@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Users, Share2, Bookmark } from 'lucide-react';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 
 const Events = () => {
   const events = [
@@ -11,8 +13,8 @@ const Events = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-extrabold mb-4">Events Hub</h1>
-        <p className="text-gray-400 max-w-2xl mx-auto">Discover and participate in the biggest campus events, workshops, and networking sessions across Zambia.</p>
+        <h1 className="text-5xl font-extrabold mb-4 tracking-tighter italic">Events <span className="text-primary italic-none">Hub</span></h1>
+        <p className="text-gray-400 max-w-2xl mx-auto font-medium uppercase tracking-widest text-[10px]">Discover and participate in the biggest campus events, workshops, and networking sessions across Zambia.</p>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-10">
@@ -20,41 +22,43 @@ const Events = () => {
           <motion.div
             key={event.id}
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="flex flex-col glass rounded-[40px] overflow-hidden border border-white/10 group"
+            viewport={{ once: true }}
           >
-            <div className="relative h-72 overflow-hidden">
-               <img src={event.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={event.title} />
-               <div className="absolute top-6 right-6 flex space-x-2">
-                 <button className="p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-primary transition-all">
-                    <Bookmark size={18} />
-                 </button>
-                 <button className="p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-primary transition-all">
-                    <Share2 size={18} />
-                 </button>
-               </div>
-               <div className="absolute bottom-6 left-6">
-                 <div className="bg-primary px-4 py-2 rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl shadow-primary/20">
-                    Featured Event
+            <Card className="flex flex-col h-full group" hoverable={false}>
+              <div className="relative h-72 overflow-hidden bg-white/5">
+                 <img src={event.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={event.title} />
+                 <div className="absolute top-6 right-6 flex space-x-2">
+                   <button className="p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-primary transition-all">
+                      <Bookmark size={18} />
+                   </button>
+                   <button className="p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-primary transition-all">
+                      <Share2 size={18} />
+                   </button>
                  </div>
-               </div>
-            </div>
-            <div className="p-8 flex-1 flex flex-col">
-               <div className="flex items-center text-primary font-bold text-sm mb-4">
-                 <Calendar size={16} className="mr-2" /> {event.date} • {event.time}
-               </div>
-               <h3 className="text-2xl font-bold mb-4">{event.title}</h3>
-               <div className="space-y-3 mb-8 text-gray-400 text-sm">
-                 <div className="flex items-center"><MapPin size={16} className="mr-3 text-primary" /> {event.venue}</div>
-                 <div className="flex items-center"><Users size={16} className="mr-3 text-primary" /> Organized by {event.organizer}</div>
-               </div>
-               <div className="mt-auto">
-                 <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl font-bold hover:bg-primary hover:border-primary transition-all">
-                    Register Now
-                 </button>
-               </div>
-            </div>
+                 <div className="absolute bottom-6 left-6">
+                   <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl border border-white/10">
+                      Featured Event
+                   </div>
+                 </div>
+              </div>
+              <div className="p-8 flex-1 flex flex-col">
+                 <div className="flex items-center text-primary font-black text-[10px] uppercase tracking-widest mb-4">
+                   <Calendar size={14} className="mr-2" /> {event.date} • {event.time}
+                 </div>
+                 <h3 className="text-2xl font-bold mb-4 tracking-tight">{event.title}</h3>
+                 <div className="space-y-3 mb-10 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                   <div className="flex items-center"><MapPin size={16} className="mr-3 text-primary" /> {event.venue}</div>
+                   <div className="flex items-center"><Users size={16} className="mr-3 text-primary" /> Organized by {event.organizer}</div>
+                 </div>
+                 <div className="mt-auto">
+                   <Button className="w-full py-4" variant="primary" size="lg">
+                      Register Now
+                   </Button>
+                 </div>
+              </div>
+            </Card>
           </motion.div>
         ))}
       </div>
