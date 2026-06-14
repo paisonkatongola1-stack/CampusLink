@@ -1,52 +1,78 @@
-# Example schema for simple movie review app
+# CampusLink Zambia Backend Schema
 
-# User table is keyed by Firebase Auth UID.
 type User @table {
-  # `@default(expr: "auth.uid")` sets it to Firebase Auth UID during insert and upsert.
   id: String! @default(expr: "auth.uid")
-  username: String! @col(dataType: "varchar(50)")
-  # The `user: User!` field in the Review table generates the following one-to-many query field.
-  #  reviews_on_user: [Review!]!
-  # The `Review` join table the following many-to-many query field.
-  #  movies_via_Review: [Movie!]!
+  email: String!
+  displayName: String
+  role: String! # student, business, landlord, employer, admin
+  university: String
+  course: String
+  year: String
+  bio: String
+  createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# Movie is keyed by a randomly generated UUID.
-type Movie @table {
-  # If you do not pass a 'key' to `@table`, Data Connect automatically adds the following 'id' column.
-  # Feel free to uncomment and customize it.
-  #  id: UUID! @default(expr: "uuidV4()")
+type Accommodation @table {
+  id: UUID! @default(expr: "uuidV4()")
   title: String!
-  imageUrl: String!
-  genre: String
+  price: String!
+  distance: String!
+  location: String!
+  image: String!
+  amenities: [String!]!
+  university: String!
+  landlord: User!
+  createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# MovieMetadata is a metadata attached to a Movie.
-# Movie <-> MovieMetadata is a one-to-one relationship
-type MovieMetadata @table {
-  # @unique ensures each Movie can only one MovieMetadata.
-  movie: Movie! @unique
-  # The movie field adds the following foreign key field. Feel free to uncomment and customize it.
-  #  movieId: UUID!
-  rating: Float
-  releaseYear: Int
-  description: String
+type MarketplaceItem @table {
+  id: UUID! @default(expr: "uuidV4()")
+  title: String!
+  price: String!
+  location: String!
+  category: String!
+  image: String!
+  rating: Float @default(value: 0.0)
+  seller: User!
+  createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# Reviews is a join table between User and Movie.
-# It has a composite primary keys `userUid` and `movieId`.
-# A user can leave reviews for many movies. A movie can have reviews from many users.
-# User  <-> Review is a one-to-many relationship
-# Movie <-> Review is a one-to-many relationship
-# Movie <-> User is a many-to-many relationship
-type Review @table(name: "Reviews", key: ["movie", "user"]) {
-  user: User!
-  # The user field adds the following foreign key field. Feel free to uncomment and customize it.
-  #  userUid: String!
-  movie: Movie!
-  # The movie field adds the following foreign key field. Feel free to uncomment and customize it.
-  #  movieId: UUID!
-  rating: Int
-  reviewText: String
-  reviewDate: Date! @default(expr: "request.time")
+type JobListing @table {
+  id: UUID! @default(expr: "uuidV4()")
+  role: String!
+  company: String!
+  location: String!
+  salary: String!
+  type: String! # Internship, Part-time, Full-time, Freelance
+  tags: [String!]!
+  employer: User!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Event @table {
+  id: UUID! @default(expr: "uuidV4()")
+  title: String!
+  date: String!
+  time: String!
+  venue: String!
+  organizerName: String!
+  image: String!
+  organizer: User!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Application @table {
+  id: UUID! @default(expr: "uuidV4()")
+  job: JobListing!
+  applicant: User!
+  status: String! @default(value: "pending") # pending, reviewed, shortlisted, rejected
+  appliedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Message @table {
+  id: UUID! @default(expr: "uuidV4()")
+  sender: User!
+  receiver: User!
+  text: String!
+  sentAt: Timestamp! @default(expr: "request.time")
 }

@@ -1,0 +1,61 @@
+query GetUser($id: String!) {
+  user(id: $id) {
+    id
+    email
+    displayName
+    role
+    university
+    course
+    year
+    bio
+  }
+}
+
+query ListAccommodations($university: String) {
+  accommodations(where: { university: { eq: $university } }) {
+    id
+    title
+    price
+    distance
+    location
+    image
+    amenities
+    university
+  }
+}
+
+query ListMarketplaceItems($category: String) {
+  marketplaceItems(where: { category: { eq: $category } }) {
+    id
+    title
+    price
+    location
+    category
+    image
+    rating
+  }
+}
+
+query ListJobs {
+  jobListings {
+    id
+    role
+    company
+    location
+    salary
+    type
+    tags
+  }
+}
+
+query ListEvents {
+  events {
+    id
+    title
+    date
+    time
+    venue
+    organizerName
+    image
+  }
+}

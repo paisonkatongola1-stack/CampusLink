@@ -42,7 +42,7 @@ const StudentDashboard = () => {
           </motion.div>
           <motion.div variants={fadeInUp} className="flex items-center space-x-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} strokeWidth={2.5} />
               <input
                 type="text"
                 placeholder="Search..."

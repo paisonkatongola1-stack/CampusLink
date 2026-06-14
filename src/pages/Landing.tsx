@@ -5,12 +5,12 @@ import { fadeInUp, staggerContainer, float, hoverScale } from '../utils/animatio
 
 const Landing = () => {
   const features = [
-    { icon: <ShoppingBag size={24} />, title: "Student Marketplace", desc: "Buy and sell laptops, books, furniture and more." },
-    { icon: <Building2 size={24} />, title: "Accommodation Finder", desc: "Find trusted rooms and boarding houses near campus." },
-    { icon: <Briefcase size={24} />, title: "Job Hub", desc: "Discover internships and student jobs across Zambia." },
-    { icon: <Building2 size={24} />, title: "Business Directory", desc: "Connect with student-friendly businesses." },
-    { icon: <Calendar size={24} />, title: "Events Hub", desc: "Discover campus events and networking opportunities." },
-    { icon: <Cpu size={24} />, title: "AI Assistant", desc: "Study support, career guidance and recommendations." },
+    { icon: <ShoppingBag size={24} strokeWidth={2.5} />, title: "Student Marketplace", desc: "Buy and sell laptops, books, furniture and more." },
+    { icon: <Building2 size={24} strokeWidth={2.5} />, title: "Accommodation Finder", desc: "Find trusted rooms and boarding houses near campus." },
+    { icon: <Briefcase size={24} strokeWidth={2.5} />, title: "Job Hub", desc: "Discover internships and student jobs across Zambia." },
+    { icon: <Building2 size={24} strokeWidth={2.5} />, title: "Business Directory", desc: "Connect with student-friendly businesses." },
+    { icon: <Calendar size={24} strokeWidth={2.5} />, title: "Events Hub", desc: "Discover campus events and networking opportunities." },
+    { icon: <Cpu size={24} strokeWidth={2.5} />, title: "AI Assistant", desc: "Study support, career guidance and recommendations." },
   ];
 
   return (
@@ -30,7 +30,7 @@ const Landing = () => {
             variants={fadeInUp}
             className="inline-flex items-center px-4 py-2 rounded-full glass border border-white/10 text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-8"
           >
-            <Sparkles size={14} className="mr-2" />
+            <Sparkles size={14} strokeWidth={2.5} className="mr-2" />
             Empowering Zambia's Future
           </motion.div>
 
@@ -51,7 +51,7 @@ const Landing = () => {
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
             <Link to="/signup">
               <motion.button {...hoverScale} className="px-10 py-5 bg-accent rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center shadow-2xl shadow-accent/20">
-                Get Started <ArrowRight size={18} className="ml-2" />
+                Get Started <ArrowRight size={18} strokeWidth={2.5} className="ml-2" />
               </motion.button>
             </Link>
             <Link to="/accommodation">

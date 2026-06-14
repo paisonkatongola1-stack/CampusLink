@@ -31,10 +31,10 @@ const Events = () => {
                  <img src={event.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={event.title} />
                  <div className="absolute top-6 right-6 flex space-x-2">
                    <button className="p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-primary transition-all">
-                      <Bookmark size={18} />
+                      <Bookmark size={18} strokeWidth={2.5} />
                    </button>
                    <button className="p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-primary transition-all">
-                      <Share2 size={18} />
+                      <Share2 size={18} strokeWidth={2.5} />
                    </button>
                  </div>
                  <div className="absolute bottom-6 left-6">

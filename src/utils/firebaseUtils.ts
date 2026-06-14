@@ -14,6 +14,10 @@ import {
 import { auth } from "../firebase";
 import { UserProfile, AccommodationListing, JobListing, MarketplaceItem } from "../types";
 
+// Note: In a real environment with Data Connect, we would use the generated SDK.
+// Since we are setting up the schema/operations, we'll keep the Firestore implementation
+// as the primary data store for the MVP, but aligned with the new schema.
+
 const db = getFirestore();
 
 export const createUserProfile = async (userId: string, data: Partial<UserProfile>) => {
@@ -21,8 +25,13 @@ export const createUserProfile = async (userId: string, data: Partial<UserProfil
 };
 
 export const getAccommodations = async (): Promise<AccommodationListing[]> => {
-  const querySnapshot = await getDocs(collection(db, "accommodation"));
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AccommodationListing));
+  try {
+    const querySnapshot = await getDocs(collection(db, "accommodation"));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AccommodationListing));
+  } catch (e) {
+    console.error("Error fetching accommodations:", e);
+    return [];
+  }
 };
 
 export const postMarketplaceItem = async (data: Partial<MarketplaceItem>) => {

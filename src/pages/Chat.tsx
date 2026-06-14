@@ -50,7 +50,7 @@ const Chat = () => {
         <motion.div variants={fadeInUp} className="flex space-x-2">
           {['Study', 'Career', 'Housing'].map((mode) => (
             <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} className="mr-2 text-primary" /> {mode}
+              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
             </button>
           ))}
         </motion.div>
@@ -89,7 +89,7 @@ const Chat = () => {
       <motion.div variants={fadeInUp} className="relative group">
          <div className="absolute inset-0 bg-primary/5 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity" />
          <div className="relative glass border border-white/10 rounded-3xl flex items-center px-6 py-3 focus-within:border-primary/50 transition-all shadow-2xl">
-            <button className="p-2 text-gray-500 hover:text-white transition-colors"><Paperclip size={20} /></button>
+            <button className="p-2 text-gray-500 hover:text-white transition-colors"><Paperclip size={20} strokeWidth={2.5} /></button>
             <input
               type="text"
               value={input}
@@ -98,7 +98,7 @@ const Chat = () => {
               placeholder="Ask me anything..."
               className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-sm font-medium placeholder:text-gray-600"
             />
-            <button className="hidden md:flex p-2 text-gray-500 hover:text-white transition-colors mr-3"><Mic size={20} /></button>
+            <button className="hidden md:flex p-2 text-gray-500 hover:text-white transition-colors mr-3"><Mic size={20} strokeWidth={2.5} /></button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

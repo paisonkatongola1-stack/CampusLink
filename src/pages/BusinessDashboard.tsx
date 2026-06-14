@@ -54,7 +54,7 @@ const BusinessDashboard = () => {
                 <div className="flex justify-between items-start mb-6">
                   <div className="p-3.5 bg-white/5 rounded-2xl group-hover:bg-primary/10 transition-colors duration-500">{stat.icon}</div>
                   <div className="flex items-center text-[10px] font-black text-green-500 bg-green-500/10 px-2 py-1 rounded-lg">
-                    <TrendingUp size={10} className="mr-1" /> {stat.trend}
+                    <TrendingUp size={10} strokeWidth={2.5} className="mr-1" /> {stat.trend}
                   </div>
                 </div>
                 <div className="text-3xl font-black tracking-tighter mb-1">{stat.value}</div>

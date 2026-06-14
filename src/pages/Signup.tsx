@@ -19,10 +19,10 @@ export default function Signup() {
     const navigate = useNavigate();
 
     const roles = [
-        { id: 'student', title: 'Student', icon: <GraduationCap size={24} />, desc: 'Find housing & jobs' },
-        { id: 'business', title: 'Business', icon: <Briefcase size={24} />, desc: 'Sell to students' },
-        { id: 'landlord', title: 'Landlord', icon: <Home size={24} />, desc: 'List your property' },
-        { id: 'employer', title: 'Employer', icon: <ShieldCheck size={24} />, desc: 'Hire top talent' },
+        { id: 'student', title: 'Student', icon: <GraduationCap size={24} strokeWidth={2.5} />, desc: 'Find housing & jobs' },
+        { id: 'business', title: 'Business', icon: <Briefcase size={24} strokeWidth={2.5} />, desc: 'Sell to students' },
+        { id: 'landlord', title: 'Landlord', icon: <Home size={24} strokeWidth={2.5} />, desc: 'List your property' },
+        { id: 'employer', title: 'Employer', icon: <ShieldCheck size={24} strokeWidth={2.5} />, desc: 'Hire top talent' },
     ] as const;
 
     const handleSignup = async (e: React.FormEvent) => {
@@ -92,7 +92,7 @@ export default function Signup() {
                                 label="Full Name"
                                 type="text"
                                 placeholder="John Doe"
-                                icon={<UserIcon size={18} />}
+                                icon={<UserIcon size={18} strokeWidth={2.5} />}
                                 onChange={(e) => setFullName(e.target.value)}
                                 required
                             />
@@ -100,7 +100,7 @@ export default function Signup() {
                                 label="Email Address"
                                 type="email"
                                 placeholder="name@university.zm"
-                                icon={<Mail size={18} />}
+                                icon={<Mail size={18} strokeWidth={2.5} />}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
@@ -110,7 +110,7 @@ export default function Signup() {
                             label="Password"
                             type="password"
                             placeholder="••••••••"
-                            icon={<Lock size={18} />}
+                            icon={<Lock size={18} strokeWidth={2.5} />}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
