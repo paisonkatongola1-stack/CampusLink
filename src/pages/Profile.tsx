@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle } from 'lucide-react';
+import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle, FileText } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import CVUpload from '../components/CVUpload';
 
 const Profile = () => {
   return (
@@ -71,6 +72,11 @@ const Profile = () => {
                   <span key={s} className="px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20 hover:bg-primary hover:text-white transition-all cursor-default">{s}</span>
                 ))}
               </div>
+           </Card>
+
+           <Card className="p-8" hoverable={false}>
+              <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-6">Curriculum Vitae</h3>
+              <CVUpload />
            </Card>
         </motion.div>
 

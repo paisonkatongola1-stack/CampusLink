@@ -13,6 +13,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import StudentDashboard from "./pages/StudentDashboard";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import LandlordDashboard from "./pages/LandlordDashboard";
+import EmployerDashboard from "./pages/EmployerDashboard";
 import Accommodation from "./pages/Accommodation";
 import Marketplace from "./pages/Marketplace";
 import Jobs from "./pages/Jobs";
@@ -21,6 +23,7 @@ import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import Services from "./pages/Services";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -53,9 +56,12 @@ function App() {
                 <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
                 <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
                 <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
                 <Route path="/business-dashboard" element={<ProtectedRoute allowedRoles={['business']}><BusinessDashboard /></ProtectedRoute>} />
+                <Route path="/landlord-dashboard" element={<ProtectedRoute allowedRoles={['landlord']}><LandlordDashboard /></ProtectedRoute>} />
+                <Route path="/employer-dashboard" element={<ProtectedRoute allowedRoles={['employer']}><EmployerDashboard /></ProtectedRoute>} />
                 <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />

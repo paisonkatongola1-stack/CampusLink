@@ -10,9 +10,12 @@ import { Sidebar } from '../components/ui/Sidebar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import PostMarketplaceModal from '../components/PostMarketplaceModal';
+import { useState } from 'react';
 
 const StudentDashboard = () => {
   const { profile } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} strokeWidth={2.5} />, label: "Dashboard", href: "/dashboard" },
@@ -81,11 +84,23 @@ const StudentDashboard = () => {
               </div>
             </div>
 
-            <Link to="/profile" className="z-10">
-              <Button variant="glass" size="sm" className="px-8">Edit Profile</Button>
-            </Link>
+            <div className="flex flex-col space-y-3 z-10">
+              <Link to="/profile">
+                <Button variant="glass" size="sm" className="w-full px-8">Edit Profile</Button>
+              </Link>
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full px-8 text-[10px] uppercase tracking-widest"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <Plus size={14} className="mr-2" /> Sell Item
+              </Button>
+            </div>
           </Card>
         </motion.div>
+
+        <PostMarketplaceModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
         <motion.div
           variants={staggerContainer}
