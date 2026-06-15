@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
 const Chat = () => {
+  const [mode, setMode] = useState<'General' | 'Study' | 'Career' | 'Housing' | 'Marketplace'>('General');
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
+    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. How can I help you today?" }
   ]);
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -16,16 +17,32 @@ const Chat = () => {
     }
   }, [messages]);
 
+  const getSimulatedResponse = (userInput: string, currentMode: string) => {
+    switch (currentMode) {
+      case 'Study':
+        return "I've analyzed your study notes. I can help you generate quiz questions or explain complex concepts. Based on Zambian curriculum standards, I recommend focusing on the core modules first.";
+      case 'Career':
+        return "Your CV looks promising! I recommend highlighting your local projects and internships. Would you like to practice a mock interview for a Zambian tech firm?";
+      case 'Housing':
+        return "Based on your preferences, I recommend looking at areas within 1km of UNZA or CBU. Prices in Silverest currently average K3,000 to K4,500.";
+      case 'Marketplace':
+        return "For that item, a fair price in the current student market would be around K500 - K800. I recommend listing it on Friday when student activity is highest.";
+      default:
+        return "I've analyzed your request. Based on current trends in Zambia, here is what I recommend for your student journey.";
+    }
+  };
+
   const handleSend = () => {
     if (!input.trim()) return;
     const newMsgs = [...messages, { role: 'user', text: input }];
     setMessages(newMsgs);
+    const userInput = input;
     setInput("");
 
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: getSimulatedResponse(userInput, mode)
       }]);
     }, 1200);
   };
@@ -47,10 +64,18 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+        <motion.div variants={fadeInUp} className="flex space-x-2 overflow-x-auto pb-2 no-scrollbar">
+          {['General', 'Study', 'Career', 'Housing', 'Marketplace'].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m as any)}
+              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center whitespace-nowrap border ${
+                mode === m
+                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                : 'glass border-white/5 text-gray-500 hover:border-primary/50'
+              }`}
+            >
+              <Sparkles size={12} strokeWidth={2.5} className={`mr-2 ${mode === m ? 'text-white' : 'text-primary'}`} /> {m}
             </button>
           ))}
         </motion.div>

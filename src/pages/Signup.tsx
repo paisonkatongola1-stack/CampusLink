@@ -18,12 +18,24 @@ export default function Signup() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const [university, setUniversity] = useState("");
+
     const roles = [
         { id: 'student', title: 'Student', icon: <GraduationCap size={24} strokeWidth={2.5} />, desc: 'Find housing & jobs' },
         { id: 'business', title: 'Business', icon: <Briefcase size={24} strokeWidth={2.5} />, desc: 'Sell to students' },
         { id: 'landlord', title: 'Landlord', icon: <Home size={24} strokeWidth={2.5} />, desc: 'List your property' },
         { id: 'employer', title: 'Employer', icon: <ShieldCheck size={24} strokeWidth={2.5} />, desc: 'Hire top talent' },
+        { id: 'admin', title: 'Admin', icon: <ShieldCheck size={24} strokeWidth={2.5} />, desc: 'Manage platform' },
     ] as const;
+
+    const universities = [
+        "University of Zambia (UNZA)",
+        "Copperbelt University (CBU)",
+        "Mulungushi University",
+        "ZCAS University",
+        "Cavendish University Zambia",
+        "Lusaka Apex Medical University"
+    ];
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,6 +51,7 @@ export default function Signup() {
                 email: user.email,
                 displayName: fullName,
                 role: role,
+                university: university,
                 createdAt: new Date()
             });
 
@@ -104,6 +117,21 @@ export default function Signup() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400">University</label>
+                            <select
+                                value={university}
+                                onChange={(e) => setUniversity(e.target.value)}
+                                className="w-full bg-secondary border border-white/10 rounded-xl py-3 px-4 focus:border-primary transition-all outline-none text-sm text-white"
+                                required
+                            >
+                                <option value="" disabled>Select your university</option>
+                                {universities.map((u) => (
+                                    <option key={u} value={u}>{u}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <Input

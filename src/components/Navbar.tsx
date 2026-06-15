@@ -20,7 +20,8 @@ const Navbar = () => {
     switch (profile.role) {
       case 'business': return '/business-dashboard';
       case 'admin': return '/admin-dashboard';
-      case 'landlord': return '/business-dashboard';
+      case 'landlord': return '/landlord-dashboard';
+      case 'employer': return '/employer-dashboard';
       default: return '/dashboard';
     }
   };
@@ -31,7 +32,8 @@ const Navbar = () => {
     { name: 'Marketplace', path: '/marketplace' },
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },
-    { name: 'Services', path: '/businesses' },
+    { name: 'Businesses', path: '/businesses' },
+    { name: 'AI Assistant', path: '/chat' },
   ];
 
   return (
