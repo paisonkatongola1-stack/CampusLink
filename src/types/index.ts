@@ -10,6 +10,8 @@ export interface UserProfile {
   year?: string;
   skills?: string[];
   bio?: string;
+  avatarUrl?: string;
+  cvUrl?: string;
   createdAt: any;
 }
 
@@ -23,6 +25,9 @@ export interface AccommodationListing {
   amenities: string[];
   landlordId: string;
   university: string;
+  city?: string;
+  genderPreference?: 'male' | 'female' | 'mixed';
+  description?: string;
 }
 
 export interface JobListing {
@@ -34,6 +39,9 @@ export interface JobListing {
   type: 'Internship' | 'Part-time' | 'Full-time' | 'Freelance';
   tags: string[];
   postedAt: any;
+  description?: string;
+  companyLogo?: string;
+  isRemote?: boolean;
 }
 
 export interface MarketplaceItem {
@@ -45,4 +53,80 @@ export interface MarketplaceItem {
   category: string;
   image: string;
   sellerId: string;
+  description?: string;
+  createdAt?: any;
+}
+
+export interface EventListing {
+  id: string;
+  title: string;
+  date: any;
+  time: string;
+  venue: string;
+  organizer: string;
+  image: string;
+  description?: string;
+  category?: string;
+  price?: string;
+}
+
+export interface BusinessProfile {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  rating: number;
+  location: string;
+  services: string[];
+  logo?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  ownerId: string;
+}
+
+export interface Application {
+  id: string;
+  jobId: string;
+  applicantId: string;
+  status: 'pending' | 'reviewing' | 'shortlisted' | 'rejected' | 'accepted';
+  appliedAt: any;
+  cvUrl?: string;
+  coverLetter?: string;
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  createdAt: any;
+  read: boolean;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  read: boolean;
+  createdAt: any;
+  link?: string;
+}
+
+export interface Review {
+  id: string;
+  targetId: string; // businessId, accommodationId, or sellerId
+  reviewerId: string;
+  rating: number;
+  comment: string;
+  createdAt: any;
+}
+
+export interface SavedItem {
+  id: string;
+  userId: string;
+  itemId: string;
+  itemType: 'accommodation' | 'job' | 'marketplace' | 'event';
+  savedAt: any;
 }
