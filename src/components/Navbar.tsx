@@ -1,5 +1,5 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
@@ -20,7 +20,8 @@ const Navbar = () => {
     switch (profile.role) {
       case 'business': return '/business-dashboard';
       case 'admin': return '/admin-dashboard';
-      case 'landlord': return '/business-dashboard';
+      case 'landlord': return '/business-dashboard'; // Landlords use business tools for listings
+      case 'employer': return '/business-dashboard'; // Employers use business tools for hiring
       default: return '/dashboard';
     }
   };
@@ -57,12 +58,15 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center space-x-4">
-              <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
-                <Sparkles size={18} strokeWidth={2.5} />
+              <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors group relative" title="CampusAI">
+                <Sparkles size={18} strokeWidth={2.5} className="group-hover:animate-pulse" />
               </Link>
               <Link to={getDashboardLink()} className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.2em] bg-white/5 border border-white/10 px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
                 <LayoutDashboard size={14} strokeWidth={2.5} />
                 <span>Panel</span>
+              </Link>
+              <Link to="/profile" className="w-8 h-8 bg-primary/20 text-primary rounded-lg flex items-center justify-center text-[10px] font-black border border-primary/20 hover:bg-primary hover:text-white transition-all">
+                {profile?.displayName?.substring(0, 1).toUpperCase() || "U"}
               </Link>
               <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 transition-colors p-2">
                 <LogOut size={18} strokeWidth={2.5} />
@@ -102,6 +106,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link to={getDashboardLink()} onClick={() => setIsOpen(false)} className="text-sm font-black uppercase tracking-[0.3em] text-primary">Dashboard</Link>
+                <Link to="/profile" onClick={() => setIsOpen(false)} className="text-sm font-black uppercase tracking-[0.3em]">Profile</Link>
                 <button onClick={handleLogout} className="text-left text-red-500 text-sm font-black uppercase tracking-[0.3em]">Logout</button>
               </>
             ) : (
