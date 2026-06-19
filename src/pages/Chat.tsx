@@ -5,7 +5,7 @@ import { fadeInUp, scaleUp } from '../utils/animations';
 
 const Chat = () => {
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
+    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, suggest fair marketplace prices, or find the best accommodation deals. What's on your mind?" }
   ]);
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -47,9 +47,9 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
+        <motion.div variants={fadeInUp} className="flex flex-wrap gap-2">
+          {['Study', 'Career', 'Housing', 'Marketplace'].map((mode) => (
+            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center mb-2 md:mb-0">
               <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
             </button>
           ))}

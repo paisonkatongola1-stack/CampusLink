@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, MapPin, Star, Plus, Tag } from 'lucide-react';
+import { Search, ShoppingCart, MapPin, Star, Plus, Tag, MessageSquare } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -83,9 +83,14 @@ const Marketplace = () => {
                   </div>
                 </div>
 
-                <Button variant="glass" className="w-full mt-auto py-4 text-[10px] font-black uppercase tracking-[0.2em] border-white/5 hover:bg-primary hover:border-primary">
-                  View Details
-                </Button>
+                <div className="flex space-x-2 mt-auto">
+                  <Button variant="glass" className="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-white/5 hover:bg-white/10">
+                    Details
+                  </Button>
+                  <Button variant="primary" className="flex-1 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+                    <MessageSquare size={14} className="mr-2" /> Message
+                  </Button>
+                </div>
               </div>
             </Card>
           </motion.div>

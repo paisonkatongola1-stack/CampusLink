@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Bookmark } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -68,7 +68,7 @@ const Accommodation = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
-        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter, i) => (
+        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'ZCAS', 'Cavendish', 'Apex', 'Self-contained'].map((filter, i) => (
           <button key={i} className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}>
             {filter}
           </button>
@@ -88,6 +88,13 @@ const Accommodation = () => {
               <div className="relative h-72 overflow-hidden bg-white/5">
                 <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={item.title} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
+
+                <div className="absolute top-6 left-6 flex space-x-2">
+                   <button className="p-2.5 bg-black/40 backdrop-blur-xl rounded-xl text-white border border-white/10 hover:bg-primary transition-all z-20">
+                      <Bookmark size={16} strokeWidth={2.5} />
+                   </button>
+                </div>
+
                 <div className="absolute top-6 right-6 bg-primary/90 backdrop-blur-xl text-white font-black px-4 py-2 rounded-xl text-sm shadow-2xl border border-white/10">
                   {item.price}<span className="text-[10px] font-normal text-white/70">/mo</span>
                 </div>
