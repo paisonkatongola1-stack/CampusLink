@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, Upload } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -26,7 +26,14 @@ const Jobs = () => {
     >
       <div className="mb-16">
         <motion.h1 variants={fadeInUp} className="text-4xl font-black mb-2 tracking-tight">Job <span className="text-primary">Hub</span></motion.h1>
-        <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Discover career opportunities and student-friendly jobs</motion.p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Discover career opportunities and student-friendly jobs</motion.p>
+          <motion.div variants={fadeInUp} className="mt-4 md:mt-0">
+             <Button variant="glass" className="border-white/10 text-[10px] font-black uppercase tracking-[0.2em]">
+                <Upload size={16} className="mr-2" /> Upload CV
+             </Button>
+          </motion.div>
+        </div>
       </div>
 
       <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-16">

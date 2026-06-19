@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle } from 'lucide-react';
+import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle, BookOpen, Calendar, Upload, Phone } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 
 const Profile = () => {
@@ -49,18 +50,26 @@ const Profile = () => {
         <motion.div variants={fadeInUp} className="md:col-span-1 space-y-8">
            <Card className="p-8 relative overflow-hidden" hoverable={false}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
-              <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-8">Personal Details</h3>
+              <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-8">Academic Info</h3>
               <div className="space-y-6">
                  {[
-                   { icon: <GraduationCap size={18} strokeWidth={2.5} />, label: "University of Zambia" },
-                   { icon: <Mail size={18} strokeWidth={2.5} />, label: "chanda@unza.zm" },
-                   { icon: <MapPin size={18} strokeWidth={2.5} />, label: "Lusaka, Zambia" },
+                   { icon: <GraduationCap size={18} strokeWidth={2.5} />, label: "University of Zambia", sub: "Institution" },
+                   { icon: <BookOpen size={18} strokeWidth={2.5} />, label: "Computer Science", sub: "Course" },
+                   { icon: <Calendar size={18} strokeWidth={2.5} />, label: "3rd Year", sub: "Year of Study" },
                  ].map((item, i) => (
-                   <div key={i} className="flex items-center space-x-4 text-sm font-bold text-gray-300">
-                     <div className="p-2 bg-primary/10 rounded-xl text-primary">{item.icon}</div>
-                     <span>{item.label}</span>
+                   <div key={i} className="flex items-center space-x-4">
+                     <div className="p-2.5 bg-primary/10 rounded-xl text-primary flex-shrink-0">{item.icon}</div>
+                     <div>
+                        <div className="text-sm font-bold text-gray-200 leading-none">{item.label}</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-gray-600 mt-1">{item.sub}</div>
+                     </div>
                    </div>
                  ))}
+              </div>
+              <div className="mt-8 pt-8 border-t border-white/5">
+                 <Button variant="primary" className="w-full text-[10px] font-black uppercase tracking-[0.2em] py-4">
+                    <Upload size={14} className="mr-2" /> Update CV
+                 </Button>
               </div>
            </Card>
 
@@ -77,10 +86,27 @@ const Profile = () => {
         <motion.div variants={fadeInUp} className="md:col-span-2 space-y-10">
            <Card className="p-10 relative overflow-hidden" hoverable={false}>
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent" />
-              <h3 className="text-2xl font-bold mb-6 tracking-tight">Biography</h3>
-              <p className="text-gray-400 text-base leading-relaxed font-medium">
-                I'm a dedicated Computer Science student at UNZA with a passion for building innovative digital solutions that address the unique challenges faced by Zambian students. I specialize in frontend development with React and have a keen eye for UI/UX design. Currently seeking internship opportunities to apply my skills in real-world projects.
-              </p>
+              <h3 className="text-2xl font-bold mb-8 tracking-tight">Profile Details</h3>
+              <div className="grid md:grid-cols-2 gap-8 mb-10">
+                 <Input label="Institutional Email" defaultValue="chanda@unza.zm" icon={<Mail size={18} />} readOnly />
+                 <Input label="Phone Number" placeholder="+260 97x xxxxxx" icon={<Phone size={18} />} />
+                 <Input label="University" defaultValue="University of Zambia" icon={<GraduationCap size={18} />} />
+                 <Input label="Current Course" defaultValue="Bachelor of Computer Science" icon={<BookOpen size={18} />} />
+                 <Input label="Year of Study" defaultValue="3rd Year" icon={<Calendar size={18} />} />
+                 <Input label="Location" defaultValue="Lusaka, Zambia" icon={<MapPin size={18} />} />
+              </div>
+
+              <div className="space-y-4">
+                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Biography</label>
+                 <textarea
+                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-sm text-gray-300 font-medium outline-none focus:border-primary transition-all min-h-[150px] resize-none"
+                   defaultValue="I'm a dedicated Computer Science student at UNZA with a passion for building innovative digital solutions that address the unique challenges faced by Zambian students. I specialize in frontend development with React and have a keen eye for UI/UX design. Currently seeking internship opportunities to apply my skills in real-world projects."
+                 />
+              </div>
+
+              <div className="mt-10 flex justify-end">
+                 <Button className="px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]">Save Profile Changes</Button>
+              </div>
            </Card>
 
            <div className="space-y-6">

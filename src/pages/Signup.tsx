@@ -3,7 +3,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { User as UserIcon, Mail, Lock, GraduationCap, Briefcase, Home, ShieldCheck } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, GraduationCap, Briefcase, Home, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
@@ -13,7 +13,7 @@ export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");
-    const [role, setRole] = useState<'student' | 'business' | 'landlord' | 'employer'>("student");
+    const [role, setRole] = useState<'student' | 'business' | 'landlord' | 'employer' | 'admin'>("student");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -23,6 +23,7 @@ export default function Signup() {
         { id: 'business', title: 'Business', icon: <Briefcase size={24} strokeWidth={2.5} />, desc: 'Sell to students' },
         { id: 'landlord', title: 'Landlord', icon: <Home size={24} strokeWidth={2.5} />, desc: 'List your property' },
         { id: 'employer', title: 'Employer', icon: <ShieldCheck size={24} strokeWidth={2.5} />, desc: 'Hire top talent' },
+        { id: 'admin', title: 'Admin', icon: <ShieldAlert size={24} strokeWidth={2.5} />, desc: 'System management' },
     ] as const;
 
     const handleSignup = async (e: React.FormEvent) => {
@@ -66,7 +67,7 @@ export default function Signup() {
                     <form onSubmit={handleSignup} className="space-y-8">
                         <div className="space-y-4">
                             <label className="text-sm font-medium text-gray-400">I want to join as a:</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                 {roles.map((r) => (
                                     <button
                                         key={r.id}
