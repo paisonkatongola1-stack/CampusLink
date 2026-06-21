@@ -19,7 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     );
   }
 
-  if (!user) {
+  if (!user && !import.meta.env.DEV) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

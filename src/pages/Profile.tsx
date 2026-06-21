@@ -1,10 +1,19 @@
 import { motion } from 'framer-motion';
-import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle } from 'lucide-react';
+import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle, Upload, FileText, X } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 
 const Profile = () => {
+  const [cvFile, setCvFile] = useState<string | null>("chanda_musonda_cv.pdf");
+
+  const handleCvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCvFile(e.target.files[0].name);
+    }
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -70,6 +79,35 @@ const Profile = () => {
                 {['React', 'TypeScript', 'Node.js', 'Python', 'UI/UX'].map(s => (
                   <span key={s} className="px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20 hover:bg-primary hover:text-white transition-all cursor-default">{s}</span>
                 ))}
+              </div>
+           </Card>
+
+           <Card className="p-8" hoverable={false}>
+              <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-6">Career Documents</h3>
+              <div className="space-y-4">
+                 {cvFile ? (
+                   <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group">
+                      <div className="flex items-center space-x-3">
+                         <div className="p-2 bg-red-500/10 text-red-500 rounded-lg">
+                            <FileText size={18} />
+                         </div>
+                         <div className="max-w-[120px]">
+                            <p className="text-[10px] font-bold text-white truncate">{cvFile}</p>
+                            <p className="text-[8px] text-gray-500 uppercase font-black">2.4 MB • PDF</p>
+                         </div>
+                      </div>
+                      <button onClick={() => setCvFile(null)} className="p-2 text-gray-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                         <X size={14} />
+                      </button>
+                   </div>
+                 ) : (
+                   <label className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:border-primary/40 transition-all bg-white/2 group">
+                      <Upload size={24} className="text-gray-500 group-hover:text-primary mb-2 transition-colors" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors">Upload CV</span>
+                      <input type="file" className="hidden" onChange={handleCvUpload} accept=".pdf,.doc,.docx" />
+                   </label>
+                 )}
+                 <p className="text-[8px] text-center text-gray-600 font-bold uppercase tracking-widest italic">PDF or Word (Max 5MB)</p>
               </div>
            </Card>
         </motion.div>

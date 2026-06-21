@@ -1,14 +1,17 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, Users, Layout, Activity,
   CheckCircle, AlertCircle, TrendingUp, DollarSign,
-  ArrowUpRight, Settings
+  ArrowUpRight, Settings, Search, MoreVertical, X, UserX, UserCheck
 } from 'lucide-react';
+import { useState } from 'react';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState<'approvals' | 'users'>('approvals');
+  const [approvalTab, setApprovalTab] = useState<'Accommodation' | 'Marketplace' | 'Events'>('Accommodation');
   const stats = [
     { label: "Total Users", val: "10,248", icon: <Users size={24} strokeWidth={2.5} />, color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Total Listings", val: "1,245", icon: <Layout size={24} strokeWidth={2.5} />, color: "text-purple-500", bg: "bg-purple-500/10" },
@@ -60,36 +63,99 @@ const AdminDashboard = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
            <motion.div variants={fadeInUp} className="space-y-8">
-              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 flex items-center ml-2">
-                <AlertCircle size={16} strokeWidth={3} className="mr-3 text-yellow-500" /> Pending Approvals
-              </h3>
-              <div className="glass overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl relative">
-                 <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
-                 <div className="flex border-b border-white/5 bg-white/2">
-                    {['Accommodation', 'Marketplace', 'Events'].map((tab, i) => (
-                      <button key={tab} className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-600 hover:text-white'}`}>
-                        {tab}
-                      </button>
-                    ))}
-                 </div>
-                 <div className="p-8 space-y-6">
-                    {[
-                      { title: "Riverside Shared Room", user: "Landlord: John B.", type: "New Listing" },
-                      { title: "Zambia Tech Expo", user: "Organizer: ICT Union", type: "Event" },
-                      { title: "HP Laptop G8 Pro", user: "Student: Mwaka M.", type: "Marketplace" }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-5 bg-white/3 rounded-[1.5rem] border border-white/5 hover:border-primary/20 transition-all group">
-                        <div>
-                          <div className="font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
-                          <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{item.user}</div>
-                        </div>
-                        <div className="flex space-x-3">
-                           <button className="p-3 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/10"><CheckCircle size={18} strokeWidth={2.5} /></button>
-                           <button className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"><AlertCircle size={18} strokeWidth={2.5} /></button>
-                        </div>
-                      </div>
-                    ))}
-                 </div>
+              <div className="flex items-center justify-between px-2">
+                <div className="flex space-x-6">
+                   <button
+                     onClick={() => setActiveTab('approvals')}
+                     className={`text-xl font-black tracking-tight uppercase text-[12px] transition-all ${activeTab === 'approvals' ? 'text-white' : 'text-gray-500'}`}
+                   >
+                     Approvals
+                   </button>
+                   <button
+                     onClick={() => setActiveTab('users')}
+                     className={`text-xl font-black tracking-tight uppercase text-[12px] transition-all ${activeTab === 'users' ? 'text-white' : 'text-gray-500'}`}
+                   >
+                     Users
+                   </button>
+                </div>
+              </div>
+
+              <div className="glass overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl relative min-h-[500px]">
+                 <AnimatePresence mode="wait">
+                    {activeTab === 'approvals' ? (
+                      <motion.div
+                        key="approvals"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="p-0"
+                      >
+                         <div className="flex border-b border-white/5 bg-white/2">
+                            {(['Accommodation', 'Marketplace', 'Events'] as const).map((tab) => (
+                              <button
+                                key={tab}
+                                onClick={() => setApprovalTab(tab)}
+                                className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${approvalTab === tab ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-600 hover:text-white'}`}
+                              >
+                                {tab}
+                              </button>
+                            ))}
+                         </div>
+                         <div className="p-8 space-y-6">
+                            {[
+                              { title: "Riverside Shared Room", user: "Landlord: John B.", type: "New Listing" },
+                              { title: "Zambia Tech Expo", user: "Organizer: ICT Union", type: "Event" },
+                              { title: "HP Laptop G8 Pro", user: "Student: Mwaka M.", type: "Marketplace" }
+                            ].map((item, i) => (
+                              <div key={i} className="flex items-center justify-between p-5 bg-white/3 rounded-[1.5rem] border border-white/5 hover:border-primary/20 transition-all group">
+                                <div>
+                                  <div className="font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
+                                  <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{item.user}</div>
+                                </div>
+                                <div className="flex space-x-3">
+                                   <button className="p-3 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/10"><CheckCircle size={18} strokeWidth={2.5} /></button>
+                                   <button className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"><AlertCircle size={18} strokeWidth={2.5} /></button>
+                                </div>
+                              </div>
+                            ))}
+                         </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="users"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className="p-8"
+                      >
+                         <div className="relative mb-8">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} strokeWidth={2.5} />
+                            <input type="text" placeholder="Search users by name or email..." className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-xs font-medium outline-none focus:border-primary transition-all" />
+                         </div>
+                         <div className="space-y-4">
+                            {[
+                              { name: "Chanda Musonda", email: "chanda@unza.zm", role: "Student", status: "Active" },
+                              { name: "Mwaka Mutale", email: "mwaka@cbu.zm", role: "Student", status: "Banned" },
+                              { name: "John Banda", email: "john@landlord.com", role: "Landlord", status: "Active" }
+                            ].map((user, i) => (
+                              <div key={i} className="flex items-center justify-between p-5 bg-white/3 rounded-2xl border border-white/5 transition-all">
+                                <div className="flex items-center space-x-4">
+                                   <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary font-black text-xs">{user.name.charAt(0)}</div>
+                                   <div>
+                                      <div className="text-sm font-bold">{user.name}</div>
+                                      <div className="text-[10px] text-gray-500 font-medium">{user.email}</div>
+                                   </div>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                   <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${user.status === 'Active' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>{user.status}</span>
+                                   <button className="p-2 text-gray-500 hover:text-white"><MoreVertical size={18} /></button>
+                                </div>
+                              </div>
+                            ))}
+                         </div>
+                      </motion.div>
+                    )}
+                 </AnimatePresence>
               </div>
            </motion.div>
 

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
 const Chat = () => {
+  const [mode, setMode] = useState<'General' | 'Study' | 'Career' | 'Housing'>('General');
   const [messages, setMessages] = useState([
     { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
   ]);
@@ -16,6 +17,16 @@ const Chat = () => {
     }
   }, [messages]);
 
+  const getAiResponse = (userText: string, currentMode: string) => {
+    const responses: any = {
+      Study: "I've analyzed your study materials. For the upcoming exams at UNZA, I recommend focusing on the core concepts we discussed. Would you like me to generate a practice quiz for you?",
+      Career: "Your CV looks great! I suggest highlighting your React projects more prominently for the 'Zambia Tech Hub' internship. I can also help you draft a cover letter.",
+      Housing: "Based on your preference for quiet areas near CBU, I found 3 new listings in Riverside that match your budget of K3,000. Would you like to see them?",
+      General: "I've analyzed your request. Based on current trends in Zambia and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs)."
+    };
+    return responses[currentMode] || responses.General;
+  };
+
   const handleSend = () => {
     if (!input.trim()) return;
     const newMsgs = [...messages, { role: 'user', text: input }];
@@ -25,7 +36,7 @@ const Chat = () => {
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: getAiResponse(input, mode)
       }]);
     }, 1200);
   };
@@ -48,9 +59,15 @@ const Chat = () => {
         </div>
 
         <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+          {['Study', 'Career', 'Housing'].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m as any)}
+              className={`px-4 py-2 border rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center ${
+                mode === m ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-400 hover:border-primary/50'
+              }`}
+            >
+              <Sparkles size={12} strokeWidth={2.5} className={`mr-2 ${mode === m ? 'text-white' : 'text-primary'}`} /> {m}
             </button>
           ))}
         </motion.div>
