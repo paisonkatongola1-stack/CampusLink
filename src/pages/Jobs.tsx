@@ -1,14 +1,17 @@
-import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, X, FileText, Upload } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
-import { fadeInUp, staggerContainer } from '../utils/animations';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 
 const Jobs = () => {
   const { data } = useCollection<JobListing>('jobs');
+  const [applyingJob, setApplyingJob] = useState<JobListing | null>(null);
+  const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
 
   const mockJobs: JobListing[] = [
     { id: '1', role: "Software Development Intern", company: "Zambia Tech Hub", location: "Remote / Lusaka", salary: "K4,000/mo", type: "Internship", tags: ["React", "Node.js"], postedAt: null },
@@ -77,9 +80,20 @@ const Jobs = () => {
                  </div>
               </div>
               <div className="flex items-center space-x-4">
-                <Button className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]" size="lg">
-                  Apply Now
-                </Button>
+                {appliedJobs.includes(job.id) ? (
+                  <div className="flex items-center space-x-2 text-green-500 font-black text-[10px] uppercase tracking-widest px-8">
+                    <CheckCircle size={16} />
+                    <span>Applied</span>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => setApplyingJob(job)}
+                    className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]"
+                    size="lg"
+                  >
+                    Apply Now
+                  </Button>
+                )}
                 <Button variant="glass" className="p-4 border-white/5">
                   <ArrowUpRight size={22} strokeWidth={2.5} />
                 </Button>
@@ -88,6 +102,78 @@ const Jobs = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      {/* Application Modal */}
+      <AnimatePresence>
+        {applyingJob && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-md"
+          >
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-xl glass border border-white/10 rounded-[3rem] p-10 relative shadow-2xl"
+            >
+              <button
+                onClick={() => setApplyingJob(null)}
+                className="absolute top-8 right-8 p-3 bg-white/5 rounded-full hover:bg-red-500 transition-all"
+              >
+                <X size={20} strokeWidth={2.5} />
+              </button>
+
+              <div className="mb-10">
+                <div className="w-16 h-16 bg-primary/20 text-primary rounded-2xl flex items-center justify-center mb-6 border border-primary/20">
+                   <Briefcase size={32} strokeWidth={2.5} />
+                </div>
+                <h2 className="text-3xl font-black mb-2 tracking-tight">Apply for <span className="text-primary">{applyingJob.role}</span></h2>
+                <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">At {applyingJob.company}</p>
+              </div>
+
+              <div className="space-y-8">
+                 <div className="p-6 bg-white/2 border border-white/5 rounded-3xl">
+                    <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Confirm Application CV</h4>
+                    <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-2xl">
+                       <div className="flex items-center space-x-4">
+                          <div className="p-2 bg-primary/20 text-primary rounded-xl">
+                             <FileText size={20} />
+                          </div>
+                          <div>
+                             <p className="text-xs font-bold">chanda_musonda_cv.pdf</p>
+                             <p className="text-[9px] text-primary font-black uppercase tracking-widest">Active Resume</p>
+                          </div>
+                       </div>
+                       <Button variant="glass" size="sm" className="text-[9px] px-4 py-2 border-white/5">Change</Button>
+                    </div>
+                 </div>
+
+                 <div className="space-y-4">
+                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2">Short Cover Note (Optional)</label>
+                    <textarea
+                      className="w-full bg-secondary border border-white/10 rounded-2xl py-4 px-6 focus:border-primary transition-all outline-none text-sm text-white min-h-[100px] placeholder:text-gray-600"
+                      placeholder="Why are you a good fit for this role?"
+                    ></textarea>
+                 </div>
+
+                 <Button
+                   onClick={() => {
+                     setAppliedJobs([...appliedJobs, applyingJob.id]);
+                     setApplyingJob(null);
+                   }}
+                   className="w-full py-5 text-[11px] uppercase tracking-[0.3em]"
+                   size="lg"
+                 >
+                    Submit Application
+                 </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

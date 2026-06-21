@@ -1,14 +1,17 @@
-import { motion } from 'framer-motion';
-import { Search, ShoppingCart, MapPin, Star, Plus, Tag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ShoppingCart, MapPin, Star, Plus, Tag, X, Image as ImageIcon, Camera, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { MarketplaceItem } from '../types';
-import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import { fadeInUp, staggerContainer, hoverScale, scaleUp } from '../utils/animations';
 
 const Marketplace = () => {
   const { data } = useCollection<MarketplaceItem>('marketplace');
+  const [showUpload, setShowUpload] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const mockItems: MarketplaceItem[] = [
     { id: '1', title: "MacBook Pro M1 2020", price: "K15,000", location: "UNZA", rating: 4.8, category: "Electronics", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80", sellerId: 'user1' },
@@ -94,10 +97,96 @@ const Marketplace = () => {
 
       <motion.button
         {...hoverScale}
+        onClick={() => setShowUpload(true)}
         className="fixed bottom-10 right-10 w-16 h-16 bg-accent rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-accent/40 z-40 text-white"
       >
         <Plus size={32} strokeWidth={3} />
       </motion.button>
+
+      {/* Upload Product Modal */}
+      <AnimatePresence>
+        {showUpload && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-md"
+          >
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-2xl glass border border-white/10 rounded-[3rem] p-10 overflow-hidden relative shadow-2xl"
+            >
+              <button
+                onClick={() => setShowUpload(false)}
+                className="absolute top-8 right-8 p-3 bg-white/5 rounded-full hover:bg-red-500 transition-all z-10"
+              >
+                <X size={20} strokeWidth={2.5} />
+              </button>
+
+              {!isSuccess ? (
+                <>
+                  <div className="mb-10">
+                    <h2 className="text-3xl font-black mb-2 tracking-tight">Sell <span className="text-primary">Something</span></h2>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Reach thousands of students instantly</p>
+                  </div>
+
+                  <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); setIsSuccess(true); }}>
+                    <div className="grid md:grid-cols-2 gap-8">
+                       <div className="space-y-6">
+                         <Input label="Item Title" placeholder="e.g. Scientific Calculator" required />
+                         <Input label="Price (K)" placeholder="e.g. 350" type="number" required />
+                         <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400">Category</label>
+                            <select className="w-full bg-secondary border border-white/10 rounded-xl py-3 px-4 focus:border-primary transition-all outline-none text-sm text-white appearance-none">
+                               <option>Electronics</option>
+                               <option>Books</option>
+                               <option>Furniture</option>
+                               <option>Fashion</option>
+                               <option>Services</option>
+                            </select>
+                         </div>
+                       </div>
+                       <div className="space-y-6">
+                         <div className="h-full min-h-[180px] border-2 border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center space-y-4 hover:border-primary/40 transition-colors cursor-pointer group bg-white/2">
+                            <div className="p-4 bg-primary/10 text-primary rounded-2xl group-hover:scale-110 transition-transform">
+                               <Camera size={32} strokeWidth={2.5} />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">Upload Images</p>
+                         </div>
+                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                       <label className="text-sm font-medium text-gray-400">Description</label>
+                       <textarea className="w-full bg-secondary border border-white/10 rounded-2xl py-4 px-6 focus:border-primary transition-all outline-none text-sm text-white min-h-[120px] placeholder:text-gray-600" placeholder="Describe the condition, age, and features..."></textarea>
+                    </div>
+
+                    <Button type="submit" className="w-full py-5 text-[11px] uppercase tracking-[0.3em]" size="lg">
+                       Post Listing Now
+                    </Button>
+                  </form>
+                </>
+              ) : (
+                <div className="text-center py-20">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 border border-green-500/20 shadow-2xl"
+                  >
+                    <CheckCircle size={48} strokeWidth={2.5} />
+                  </motion.div>
+                  <h2 className="text-3xl font-black mb-4 tracking-tight">Listing <span className="text-green-500">Live!</span></h2>
+                  <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mb-12">Your item is now visible to the student community.</p>
+                  <Button onClick={() => setShowUpload(false)} variant="glass" className="px-10">Done</Button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

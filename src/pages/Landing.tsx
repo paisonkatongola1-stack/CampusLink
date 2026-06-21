@@ -1,7 +1,38 @@
-import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Building2, ShoppingBag, Briefcase, Calendar, Cpu } from 'lucide-react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { ArrowRight, Sparkles, Building2, ShoppingBag, Briefcase, Calendar, Cpu, MapPin, Search, Star, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { fadeInUp, staggerContainer, float, hoverScale } from '../utils/animations';
+
+const Counter = ({ value, label }: { value: string, label: string }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+  const [displayValue, setDisplayValue] = useState("0");
+  const numericValue = parseInt(value.replace(/\D/g, ''));
+  const suffix = value.replace(/[0-9]/g, '');
+
+  useEffect(() => {
+    const animation = animate(count, numericValue, { duration: 2, ease: "easeOut" });
+    const unsubscribe = rounded.on("change", (v) => setDisplayValue(v.toString()));
+    return () => {
+      animation.stop();
+      unsubscribe();
+    };
+  }, [numericValue, count, rounded]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+    >
+      <h3 className="text-4xl lg:text-5xl font-black text-white mb-2 tracking-tighter">
+        {displayValue}{suffix}
+      </h3>
+      <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">{label}</p>
+    </motion.div>
+  );
+};
 
 const Landing = () => {
   const features = [
@@ -70,37 +101,76 @@ const Landing = () => {
         >
           {/* Floating Cards Mockup */}
           <div className="relative z-10 grid grid-cols-2 gap-6 p-4">
-             <motion.div {...float} className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl">
-                <div className="w-12 h-12 bg-primary/20 rounded-2xl mb-4 flex items-center justify-center text-primary"><ShoppingBag size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-20 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-12 bg-white/10 rounded-full" />
+             <motion.div {...float} className="glass p-6 rounded-[2rem] border border-white/10 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary"><ShoppingBag size={20} strokeWidth={2.5} /></div>
+                  <div>
+                    <div className="h-2 w-16 bg-white/20 rounded-full mb-1" />
+                    <div className="h-1.5 w-10 bg-white/10 rounded-full" />
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-primary">K1,200</span>
+                  <div className="flex space-x-1">
+                    <Star size={8} className="fill-yellow-500 text-yellow-500" />
+                    <Star size={8} className="fill-yellow-500 text-yellow-500" />
+                    <Star size={8} className="fill-yellow-500 text-yellow-500" />
+                  </div>
+                </div>
              </motion.div>
+
              <motion.div
                animate={{ y: [0, 15, 0] }}
                transition={{ repeat: Infinity, duration: 4, delay: 0.5, ease: "easeInOut" }}
-               className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl mt-16"
+               className="glass p-6 rounded-[2rem] border border-white/10 shadow-2xl mt-16"
              >
-                <div className="w-12 h-12 bg-accent/20 rounded-2xl mb-4 flex items-center justify-center text-accent"><Briefcase size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-16 bg-white/10 rounded-full" />
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-accent/20 rounded-xl flex items-center justify-center text-accent"><Briefcase size={20} strokeWidth={2.5} /></div>
+                  <div>
+                    <div className="h-2 w-20 bg-white/20 rounded-full mb-1" />
+                    <div className="h-1.5 w-12 bg-white/10 rounded-full" />
+                  </div>
+                </div>
+                <div className="flex items-center text-[8px] font-bold text-gray-500">
+                  <MapPin size={10} className="mr-1 text-primary" /> Lusaka, ZM
+                </div>
              </motion.div>
+
              <motion.div
                animate={{ y: [0, -15, 0] }}
                transition={{ repeat: Infinity, duration: 5, delay: 1, ease: "easeInOut" }}
-               className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl -mt-8"
+               className="glass p-6 rounded-[2rem] border border-white/10 shadow-2xl -mt-8"
              >
-                <div className="w-12 h-12 bg-blue-500/20 rounded-2xl mb-4 flex items-center justify-center text-blue-500"><Building2 size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-20 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-12 bg-white/10 rounded-full" />
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-500"><Building2 size={20} strokeWidth={2.5} /></div>
+                  <div>
+                    <div className="h-2 w-16 bg-white/20 rounded-full mb-1" />
+                    <div className="h-1.5 w-10 bg-white/10 rounded-full" />
+                  </div>
+                </div>
+                <div className="bg-primary/10 text-primary text-[8px] font-black py-1 px-2 rounded-lg inline-block">
+                  VERIFIED
+                </div>
              </motion.div>
+
              <motion.div
                animate={{ y: [0, 20, 0] }}
                transition={{ repeat: Infinity, duration: 3.5, delay: 0.2, ease: "easeInOut" }}
-               className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl mt-8"
+               className="glass p-6 rounded-[2rem] border border-white/10 shadow-2xl mt-8"
              >
-                <div className="w-12 h-12 bg-purple-500/20 rounded-2xl mb-4 flex items-center justify-center text-purple-500"><Calendar size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-16 bg-white/10 rounded-full" />
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-500"><Calendar size={20} strokeWidth={2.5} /></div>
+                  <div>
+                    <div className="h-2 w-20 bg-white/20 rounded-full mb-1" />
+                    <div className="h-1.5 w-12 bg-white/10 rounded-full" />
+                  </div>
+                </div>
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-5 h-5 rounded-full border-2 border-[#0A0B14] bg-gray-700" />
+                  ))}
+                  <div className="w-5 h-5 rounded-full border-2 border-[#0A0B14] bg-primary flex items-center justify-center text-[6px] font-bold">+12</div>
+                </div>
              </motion.div>
           </div>
         </motion.div>
@@ -110,22 +180,13 @@ const Landing = () => {
       <section className="w-full bg-[#05060B] py-24 px-6 border-y border-white/5">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-12 text-center">
           {[
-            { label: "Verified Students", value: "5000+" },
-            { label: "Active Businesses", value: "500+" },
-            { label: "Room Listings", value: "2000+" },
+            { label: "Students", value: "5000+" },
+            { label: "Businesses", value: "500+" },
+            { label: "Accommodation Listings", value: "2000+" },
             { label: "Jobs Posted", value: "1000+" },
-            { label: "Events Monthly", value: "50+" },
+            { label: "Campus Events", value: "50+" },
           ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-4xl font-black text-white mb-2 tracking-tighter">{stat.value}</h3>
-              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">{stat.label}</p>
-            </motion.div>
+            <Counter key={i} value={stat.value} label={stat.label} />
           ))}
         </div>
       </section>

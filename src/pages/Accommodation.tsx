@@ -1,14 +1,21 @@
-import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Heart, Map as MapIcon, X } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { AccommodationListing } from '../types';
-import { fadeInUp, staggerContainer } from '../utils/animations';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 
 const Accommodation = () => {
   const { data } = useCollection<AccommodationListing>('accommodation');
+  const [showMap, setShowMap] = useState(false);
+  const [saved, setSaved] = useState<string[]>([]);
+
+  const toggleSave = (id: string) => {
+    setSaved(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
   const mockListings: AccommodationListing[] = [
     {
@@ -88,6 +95,14 @@ const Accommodation = () => {
               <div className="relative h-72 overflow-hidden bg-white/5">
                 <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={item.title} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
+
+                <button
+                  onClick={() => toggleSave(item.id)}
+                  className="absolute top-6 left-6 p-3 glass rounded-full border border-white/10 z-10 transition-all hover:scale-110"
+                >
+                  <Heart size={18} className={saved.includes(item.id) ? "fill-accent text-accent" : "text-white"} />
+                </button>
+
                 <div className="absolute top-6 right-6 bg-primary/90 backdrop-blur-xl text-white font-black px-4 py-2 rounded-xl text-sm shadow-2xl border border-white/10">
                   {item.price}<span className="text-[10px] font-normal text-white/70">/mo</span>
                 </div>
@@ -112,6 +127,63 @@ const Accommodation = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      {/* Map Toggle Button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setShowMap(true)}
+        className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-primary px-8 py-4 rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-primary/40 z-40 flex items-center space-x-3"
+      >
+        <MapIcon size={18} strokeWidth={2.5} />
+        <span>Open Map View</span>
+      </motion.button>
+
+      {/* Map Modal Placeholder */}
+      <AnimatePresence>
+        {showMap && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-5xl h-[80vh] glass border border-white/10 rounded-[3rem] overflow-hidden relative shadow-2xl"
+            >
+              <div className="absolute top-8 right-8 z-10">
+                <button
+                  onClick={() => setShowMap(false)}
+                  className="p-3 bg-black/50 backdrop-blur-xl rounded-full border border-white/10 hover:bg-red-500 transition-all"
+                >
+                  <X size={24} strokeWidth={2.5} />
+                </button>
+              </div>
+
+              <div className="absolute inset-0 flex items-center justify-center bg-white/5">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 text-primary border border-primary/20 shadow-2xl">
+                    <MapIcon size={40} strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-3xl font-black mb-4 tracking-tight">Interactive Map</h2>
+                  <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-xs">Map functionality is currently in development.</p>
+                </div>
+              </div>
+
+              {/* Decorative Map Elements */}
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
+                 <div className="absolute top-1/4 left-1/3 w-4 h-4 bg-primary rounded-full blur-sm" />
+                 <div className="absolute bottom-1/3 right-1/4 w-3 h-3 bg-accent rounded-full blur-xs" />
+                 <div className="absolute top-1/2 right-1/2 w-5 h-5 bg-blue-500 rounded-full blur-md" />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
