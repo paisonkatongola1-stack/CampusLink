@@ -10,6 +10,8 @@ export interface UserProfile {
   year?: string;
   skills?: string[];
   bio?: string;
+  avatarUrl?: string;
+  cvUrl?: string;
   createdAt: any;
 }
 
@@ -23,6 +25,8 @@ export interface AccommodationListing {
   amenities: string[];
   landlordId: string;
   university: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
 }
 
 export interface JobListing {
@@ -33,6 +37,8 @@ export interface JobListing {
   salary: string;
   type: 'Internship' | 'Part-time' | 'Full-time' | 'Freelance';
   tags: string[];
+  postedBy: string;
+  status: 'pending' | 'approved' | 'rejected';
   postedAt: any;
 }
 
@@ -45,4 +51,51 @@ export interface MarketplaceItem {
   category: string;
   image: string;
   sellerId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+}
+
+export interface EventListing {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  venue: string;
+  organizer: string;
+  image: string;
+  category: string;
+  organizerId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+}
+
+export interface BusinessProfile {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  rating: number;
+  location: string;
+  services: string[];
+  ownerId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: any;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  timestamp: any;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  read: boolean;
+  createdAt: any;
 }

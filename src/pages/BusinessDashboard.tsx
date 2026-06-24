@@ -8,8 +8,14 @@ import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Sidebar } from '../components/ui/Sidebar';
+import { CreateListing } from '../components/CreateListing';
+import { useAuth } from '../context/AuthContext';
 
 const BusinessDashboard = () => {
+  const { profile } = useAuth();
+  const [showCreate, setShowCreate] = useState(false);
+  const [listingType, setListingType] = useState<'accommodation' | 'marketplace' | 'jobs' | 'events'>('jobs');
+
   const stats = [
     { label: "Total Views", value: "12.4k", icon: <Eye size={22} strokeWidth={2.5} className="text-blue-500" />, trend: "+12%" },
     { label: "Inquiries", value: "48", icon: <MessageCircle size={22} strokeWidth={2.5} className="text-green-500" />, trend: "+5%" },
@@ -41,10 +47,39 @@ const BusinessDashboard = () => {
             <h1 className="text-3xl font-black tracking-tight uppercase italic">Business <span className="text-primary italic-none">Hub</span></h1>
             <p className="text-gray-500 font-black uppercase tracking-[0.2em] text-[10px]">Manage your ecosystem presence</p>
           </motion.div>
-          <motion.button {...hoverScale} className="flex items-center px-8 py-4 bg-primary rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
-            <Plus size={18} strokeWidth={3} className="mr-2" /> Post New
-          </motion.button>
+          <div className="flex space-x-3">
+             <select
+               className="bg-white/5 border border-white/10 rounded-2xl px-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-primary/50"
+               value={listingType}
+               onChange={(e) => setListingType(e.target.value as any)}
+             >
+               <option value="jobs">Job Listing</option>
+               <option value="accommodation">Accommodation</option>
+               <option value="marketplace">Marketplace</option>
+               <option value="events">Event</option>
+             </select>
+             <motion.button
+               {...hoverScale}
+               onClick={() => setShowCreate(true)}
+               className="flex items-center px-8 py-4 bg-primary rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20"
+             >
+               <Plus size={18} strokeWidth={3} className="mr-2" /> Post New
+             </motion.button>
+          </div>
         </header>
+
+        <AnimatePresence>
+          {showCreate && (
+            <CreateListing
+              type={listingType}
+              onClose={() => setShowCreate(false)}
+              onSuccess={() => {
+                // Could refresh data here
+                setShowCreate(false);
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         <motion.div variants={staggerContainer} className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {stats.map((stat, i) => (
