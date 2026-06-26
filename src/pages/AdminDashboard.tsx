@@ -7,8 +7,20 @@ import {
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { useCollection } from '../hooks/useData';
+import { where } from 'firebase/firestore';
+import { updateDocument } from '../utils/firebaseUtils';
+import { useState } from 'react';
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState<'accommodation' | 'marketplace' | 'events'>('accommodation');
+  const { data: pendingItems } = useCollection(activeTab, [
+    where('status', '==', 'pending')
+  ]);
+
+  const handleApproval = async (id: string, status: 'approved' | 'rejected') => {
+    await updateDocument(activeTab, id, { status });
+  };
   const stats = [
     { label: "Total Users", val: "10,248", icon: <Users size={24} strokeWidth={2.5} />, color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Total Listings", val: "1,245", icon: <Layout size={24} strokeWidth={2.5} />, color: "text-purple-500", bg: "bg-purple-500/10" },
@@ -66,29 +78,43 @@ const AdminDashboard = () => {
               <div className="glass overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl relative">
                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
                  <div className="flex border-b border-white/5 bg-white/2">
-                    {['Accommodation', 'Marketplace', 'Events'].map((tab, i) => (
-                      <button key={tab} className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-600 hover:text-white'}`}>
+                    {(['accommodation', 'marketplace', 'events'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeTab === tab ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-600 hover:text-white'}`}
+                      >
                         {tab}
                       </button>
                     ))}
                  </div>
                  <div className="p-8 space-y-6">
-                    {[
-                      { title: "Riverside Shared Room", user: "Landlord: John B.", type: "New Listing" },
-                      { title: "Zambia Tech Expo", user: "Organizer: ICT Union", type: "Event" },
-                      { title: "HP Laptop G8 Pro", user: "Student: Mwaka M.", type: "Marketplace" }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-5 bg-white/3 rounded-[1.5rem] border border-white/5 hover:border-primary/20 transition-all group">
-                        <div>
-                          <div className="font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
-                          <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{item.user}</div>
+                    {pendingItems.length === 0 ? (
+                      <div className="text-center py-10 text-gray-600 text-[10px] font-black uppercase tracking-widest">No pending approvals</div>
+                    ) : (
+                      pendingItems.map((item: any) => (
+                        <div key={item.id} className="flex items-center justify-between p-5 bg-white/3 rounded-[1.5rem] border border-white/5 hover:border-primary/20 transition-all group">
+                          <div>
+                            <div className="font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
+                            <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{item.university || item.category || 'General'}</div>
+                          </div>
+                          <div className="flex space-x-3">
+                            <button
+                              onClick={() => handleApproval(item.id, 'approved')}
+                              className="p-3 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/10"
+                            >
+                              <CheckCircle size={18} strokeWidth={2.5} />
+                            </button>
+                            <button
+                              onClick={() => handleApproval(item.id, 'rejected')}
+                              className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"
+                            >
+                              <AlertCircle size={18} strokeWidth={2.5} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex space-x-3">
-                           <button className="p-3 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/10"><CheckCircle size={18} strokeWidth={2.5} /></button>
-                           <button className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"><AlertCircle size={18} strokeWidth={2.5} /></button>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                  </div>
               </div>
            </motion.div>
