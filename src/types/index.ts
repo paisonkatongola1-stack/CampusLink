@@ -46,3 +46,15 @@ export interface MarketplaceItem {
   image: string;
   sellerId: string;
 }
+
+export interface EventListing {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  venue: string;
+  organizer: string;
+  image: string;
+  category: string;
+  description?: string;
+}

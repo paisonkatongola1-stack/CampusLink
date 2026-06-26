@@ -10,9 +10,12 @@ import { Sidebar } from '../components/ui/Sidebar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import CreateListing from '../components/CreateListing';
+import { useState } from 'react';
 
 const StudentDashboard = () => {
   const { profile } = useAuth();
+  const [isListingModalOpen, setIsListingModalOpen] = useState(false);
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} strokeWidth={2.5} />, label: "Dashboard", href: "/dashboard" },
@@ -41,6 +44,13 @@ const StudentDashboard = () => {
             <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Welcome back, {profile?.displayName || 'Student'}</p>
           </motion.div>
           <motion.div variants={fadeInUp} className="flex items-center space-x-4">
+            <Button
+              onClick={() => setIsListingModalOpen(true)}
+              size="sm"
+              className="hidden md:flex px-6 text-[10px] uppercase tracking-widest"
+            >
+              Post New
+            </Button>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} strokeWidth={2.5} />
               <input
@@ -55,6 +65,11 @@ const StudentDashboard = () => {
             </button>
           </motion.div>
         </header>
+
+        <CreateListing
+          isOpen={isListingModalOpen}
+          onClose={() => setIsListingModalOpen(false)}
+        />
 
         <motion.div variants={fadeInUp} className="mb-12">
           <Card className="p-10 flex flex-col md:flex-row items-center md:items-start space-y-8 md:space-y-0 md:space-x-10 relative overflow-hidden" hoverable={false}>

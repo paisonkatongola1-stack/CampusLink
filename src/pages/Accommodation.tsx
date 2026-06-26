@@ -6,9 +6,16 @@ import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { AccommodationListing } from '../types';
 import { fadeInUp, staggerContainer } from '../utils/animations';
+import { Plus } from 'lucide-react';
+import CreateListing from '../components/CreateListing';
+import { useState } from 'react';
+import { startConversation } from '../utils/firebaseUtils';
+import { useNavigate } from 'react-router-dom';
 
 const Accommodation = () => {
   const { data } = useCollection<AccommodationListing>('accommodation');
+  const [isListingModalOpen, setIsListingModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const mockListings: AccommodationListing[] = [
     {
@@ -64,8 +71,21 @@ const Accommodation = () => {
            <Button variant="glass" className="p-3.5">
               <Filter size={20} strokeWidth={2.5} />
            </Button>
+           <Button
+             onClick={() => setIsListingModalOpen(true)}
+             variant="primary"
+             className="p-3.5"
+           >
+              <Plus size={20} strokeWidth={2.5} />
+           </Button>
         </motion.div>
       </div>
+
+      <CreateListing
+        isOpen={isListingModalOpen}
+        onClose={() => setIsListingModalOpen(false)}
+        defaultType="accommodation"
+      />
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
         {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter, i) => (
@@ -104,7 +124,15 @@ const Accommodation = () => {
                 <div className="flex items-center text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-10">
                   <MapPin size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {item.distance} • {item.location}
                 </div>
-                <Button className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em]" variant="primary" size="lg">
+                <Button
+                  onClick={() => {
+                    startConversation(item.landlordId, `Hi, I'm interested in ${item.title}`);
+                    navigate('/messages');
+                  }}
+                  className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em]"
+                  variant="primary"
+                  size="lg"
+                >
                   Contact Landlord
                 </Button>
               </div>

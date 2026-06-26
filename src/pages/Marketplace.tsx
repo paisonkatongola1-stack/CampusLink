@@ -6,8 +6,11 @@ import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { MarketplaceItem } from '../types';
 import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import { startConversation } from '../utils/firebaseUtils';
+import { useNavigate } from 'react-router-dom';
 
 const Marketplace = () => {
+  const navigate = useNavigate();
   const { data } = useCollection<MarketplaceItem>('marketplace');
 
   const mockItems: MarketplaceItem[] = [
@@ -83,8 +86,15 @@ const Marketplace = () => {
                   </div>
                 </div>
 
-                <Button variant="glass" className="w-full mt-auto py-4 text-[10px] font-black uppercase tracking-[0.2em] border-white/5 hover:bg-primary hover:border-primary">
-                  View Details
+                <Button
+                  onClick={() => {
+                    startConversation(item.sellerId, `Hi, I'm interested in ${item.title}`);
+                    navigate('/messages');
+                  }}
+                  variant="glass"
+                  className="w-full mt-auto py-4 text-[10px] font-black uppercase tracking-[0.2em] border-white/5 hover:bg-primary hover:border-primary"
+                >
+                  Message Seller
                 </Button>
               </div>
             </Card>
