@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Search, ShoppingCart, MapPin, Star, Plus, Tag } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ShoppingCart, MapPin, Star, Plus, Tag, X, Camera } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -9,6 +10,7 @@ import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
 
 const Marketplace = () => {
   const { data } = useCollection<MarketplaceItem>('marketplace');
+  const [showUpload, setShowUpload] = useState(false);
 
   const mockItems: MarketplaceItem[] = [
     { id: '1', title: "MacBook Pro M1 2020", price: "K15,000", location: "UNZA", rating: 4.8, category: "Electronics", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80", sellerId: 'user1' },
@@ -94,10 +96,73 @@ const Marketplace = () => {
 
       <motion.button
         {...hoverScale}
+        onClick={() => setShowUpload(true)}
         className="fixed bottom-10 right-10 w-16 h-16 bg-accent rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-accent/40 z-40 text-white"
       >
         <Plus size={32} strokeWidth={3} />
       </motion.button>
+
+      {/* Upload Modal */}
+      <AnimatePresence>
+        {showUpload && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-6">
+             <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setShowUpload(false)}
+               className="absolute inset-0 bg-[#0A0B14]/80 backdrop-blur-md"
+             />
+             <motion.div
+               initial={{ opacity: 0, scale: 0.9, y: 20 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.9, y: 20 }}
+               className="relative w-full max-w-2xl"
+             >
+                <Card className="p-10 border-white/10 shadow-2xl" hoverable={false}>
+                   <div className="flex justify-between items-center mb-10">
+                      <h2 className="text-3xl font-black tracking-tight">List <span className="text-primary italic">Product</span></h2>
+                      <button onClick={() => setShowUpload(false)} className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
+                        <X size={20} strokeWidth={2.5} />
+                      </button>
+                   </div>
+
+                   <form className="space-y-8">
+                      <div className="grid md:grid-cols-2 gap-8">
+                         <div className="space-y-6">
+                            <Input label="Product Name" placeholder="e.g. MacBook Pro M2" required />
+                            <Input label="Price (ZMW)" placeholder="e.g. 15000" type="number" required />
+                            <div className="space-y-2">
+                               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Category</label>
+                               <select className="w-full bg-white/5 border border-white/10 rounded-xl py-3.5 px-4 outline-none focus:border-primary transition-all text-sm font-medium">
+                                  {['Electronics', 'Books', 'Furniture', 'Fashion', 'Services'].map(cat => (
+                                    <option key={cat} value={cat.toLowerCase()}>{cat}</option>
+                                  ))}
+                               </select>
+                            </div>
+                         </div>
+                         <div className="space-y-6">
+                            <div className="h-full min-h-[180px] border-2 border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center space-y-4 hover:border-primary/40 transition-all cursor-pointer group">
+                               <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 group-hover:text-primary group-hover:bg-primary/10 transition-all">
+                                  <Camera size={28} strokeWidth={2.5} />
+                               </div>
+                               <div className="text-center">
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-white">Upload Photos</p>
+                                  <p className="text-[9px] font-bold text-gray-500 uppercase mt-1">PNG, JPG up to 10MB</p>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                      <div className="flex space-x-4 pt-4">
+                         <Button variant="secondary" className="flex-1" onClick={() => setShowUpload(false)}>Cancel</Button>
+                         <Button variant="primary" className="flex-1">List Product</Button>
+                      </div>
+                   </form>
+                </Card>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

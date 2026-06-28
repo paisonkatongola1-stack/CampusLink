@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, Upload } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -52,10 +52,13 @@ const Jobs = () => {
             <Input placeholder="Search roles or companies..." icon={<Search size={20} strokeWidth={2.5} />} className="shadow-2xl" />
          </div>
          <div className="flex space-x-2">
-           {['Internship', 'Part-time', 'Remote'].map(f => (
+           {['Internship', 'Part-time', 'Full-time', 'Remote'].map(f => (
              <Button key={f} variant="glass" size="sm" className="text-[10px] font-black uppercase tracking-[0.2em] border-white/5">{f}</Button>
            ))}
          </div>
+         <Button variant="accent" size="lg" className="px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em]">
+            <Upload size={18} strokeWidth={3} className="mr-2" /> Upload CV
+         </Button>
       </motion.div>
 
       <motion.div variants={staggerContainer} className="space-y-6">
