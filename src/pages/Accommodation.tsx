@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Heart, Map as MapIcon } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -75,23 +75,27 @@ const Accommodation = () => {
         ))}
       </motion.div>
 
-      <motion.div
-        variants={staggerContainer}
-        className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
-      >
-        {listings.map((item, i) => (
-          <motion.div
-            key={item.id}
-            variants={fadeInUp}
-          >
-            <Card className="p-0 group relative overflow-hidden" hoverable={true}>
-              <div className="relative h-72 overflow-hidden bg-white/5">
-                <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={item.title} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
-                <div className="absolute top-6 right-6 bg-primary/90 backdrop-blur-xl text-white font-black px-4 py-2 rounded-xl text-sm shadow-2xl border border-white/10">
-                  {item.price}<span className="text-[10px] font-normal text-white/70">/mo</span>
+      <div className="grid lg:grid-cols-3 gap-12 mb-12">
+        <motion.div
+          variants={staggerContainer}
+          className="lg:col-span-2 grid md:grid-cols-2 gap-10"
+        >
+          {listings.map((item, i) => (
+            <motion.div
+              key={item.id}
+              variants={fadeInUp}
+            >
+              <Card className="p-0 group relative overflow-hidden" hoverable={true}>
+                <div className="relative h-72 overflow-hidden bg-white/5">
+                  <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={item.title} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-40 group-hover:opacity-60 transition-opacity" />
+                  <div className="absolute top-6 left-6 bg-primary/90 backdrop-blur-xl text-white font-black px-4 py-2 rounded-xl text-sm shadow-2xl border border-white/10">
+                    {item.price}<span className="text-[10px] font-normal text-white/70">/mo</span>
+                  </div>
+                  <button className="absolute top-6 right-6 p-3 bg-black/40 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-red-500 transition-all z-10">
+                    <Heart size={18} strokeWidth={2.5} />
+                  </button>
                 </div>
-              </div>
               <div className="p-8">
                 <div className="flex justify-between items-start mb-3">
                    <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
@@ -110,8 +114,25 @@ const Accommodation = () => {
               </div>
             </Card>
           </motion.div>
-        ))}
-      </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Map Placeholder */}
+        <motion.div variants={fadeInUp} className="hidden lg:block">
+           <Card className="sticky top-28 p-0 h-[600px] overflow-hidden bg-white/2 border-white/5 flex flex-col items-center justify-center text-center group" hoverable={false}>
+              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+              <div className="relative z-10 p-10">
+                 <div className="w-24 h-24 bg-primary/10 rounded-[2.5rem] flex items-center justify-center text-primary mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-2xl shadow-primary/10">
+                    <MapIcon size={40} strokeWidth={2.5} />
+                 </div>
+                 <h3 className="text-2xl font-black mb-4 tracking-tight">Interactive Map</h3>
+                 <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-10 max-w-xs mx-auto">Visualize listings near UNZA, CBU and other campuses across Zambia</p>
+                 <Button variant="glass" className="px-10">Enable Location</Button>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-primary/10 to-transparent" />
+           </Card>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };

@@ -149,6 +149,53 @@ const StudentDashboard = () => {
                ))}
             </div>
           </motion.div>
+
+          {/* Marketplace Listings */}
+          <motion.div variants={fadeInUp} className="space-y-6">
+            <div className="flex justify-between items-center px-2">
+              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500">Marketplace</h3>
+              <Link to="/marketplace" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80">View All</Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+               {[
+                 { title: "MacBook Pro", price: "K15,000", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80" },
+                 { title: "Calculus 9th Ed", price: "K450", image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=800&q=80" }
+               ].map((item, i) => (
+                 <Card key={i} className="p-0 overflow-hidden group" hoverable={true}>
+                    <div className="h-32 bg-white/5 overflow-hidden">
+                       <img src={item.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={item.title} />
+                    </div>
+                    <div className="p-4">
+                       <div className="font-bold text-xs truncate mb-1">{item.title}</div>
+                       <div className="text-primary font-black text-sm">{item.price}</div>
+                    </div>
+                 </Card>
+               ))}
+            </div>
+          </motion.div>
+
+          {/* Upcoming Events */}
+          <motion.div variants={fadeInUp} className="space-y-6">
+            <div className="flex justify-between items-center px-2">
+              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500">Upcoming Events</h3>
+              <Link to="/events" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80">View All</Link>
+            </div>
+            <div className="space-y-4">
+               {[
+                 { title: "Zambia Tech Expo", date: "Oct 24", icon: <Calendar size={18} /> },
+                 { title: "Entrepreneurship Summit", date: "Nov 05", icon: <Sparkles size={18} /> }
+               ].map((event, i) => (
+                 <Card key={i} className="p-4 flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">{event.icon}</div>
+                    <div className="flex-1">
+                       <div className="font-bold text-xs">{event.title}</div>
+                       <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{event.date}</div>
+                    </div>
+                    <Button variant="glass" size="sm" className="px-3 py-1">Join</Button>
+                 </Card>
+               ))}
+            </div>
+          </motion.div>
         </motion.div>
       </main>
     </motion.div>

@@ -1,5 +1,5 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles, Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
@@ -31,7 +31,8 @@ const Navbar = () => {
     { name: 'Marketplace', path: '/marketplace' },
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },
-    { name: 'Services', path: '/businesses' },
+    { name: 'Businesses', path: '/businesses' },
+    { name: 'AI Assistant', path: '/chat' },
   ];
 
   return (
@@ -57,6 +58,9 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center space-x-4">
+              <button className="text-gray-400 hover:text-white transition-colors p-2">
+                <Moon size={18} strokeWidth={2.5} />
+              </button>
               <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
                 <Sparkles size={18} strokeWidth={2.5} />
               </Link>
@@ -70,6 +74,9 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
+              <button className="text-gray-400 hover:text-white transition-colors p-2">
+                <Moon size={18} strokeWidth={2.5} />
+              </button>
               <Link to="/login" className="text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors px-4 py-2">Login</Link>
               <Link to="/signup">
                 <Button size="sm" className="px-6 py-2.5 text-[10px] uppercase tracking-[0.2em]">Join Now</Button>

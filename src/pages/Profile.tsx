@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle } from 'lucide-react';
+import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle, Award, ShieldCheck } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
@@ -26,12 +26,24 @@ const Profile = () => {
             </motion.button>
           </div>
           <div className="mt-4 md:ml-8 md:mb-4">
-            <h1 className="text-4xl font-black flex items-center tracking-tight">
-              Chanda Musonda
-              <div className="ml-3 p-1.5 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
-                <CheckCircle size={14} strokeWidth={4} className="text-white" />
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <h1 className="text-4xl font-black flex items-center tracking-tight">
+                Chanda Musonda
+                <div className="ml-3 p-1.5 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                  <CheckCircle size={14} strokeWidth={4} className="text-white" />
+                </div>
+              </h1>
+              <div className="flex gap-2">
+                 <div className="px-3 py-1 bg-accent/20 text-accent rounded-full border border-accent/20 flex items-center gap-1.5 shadow-xl shadow-accent/5">
+                    <Award size={12} strokeWidth={3} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Top Rated Seller</span>
+                 </div>
+                 <div className="px-3 py-1 bg-green-500/20 text-green-500 rounded-full border border-green-500/20 flex items-center gap-1.5 shadow-xl shadow-green-500/5">
+                    <ShieldCheck size={12} strokeWidth={3} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Verified Student</span>
+                 </div>
               </div>
-            </h1>
+            </div>
             <p className="text-primary font-black uppercase tracking-[0.2em] text-xs mt-1">@chanda_dev • Computer Science Student</p>
           </div>
         </div>
