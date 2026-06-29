@@ -1,14 +1,19 @@
-import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, X, Upload, FileText } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
-import { fadeInUp, staggerContainer } from '../utils/animations';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import { uploadFile, applyForJob } from '../utils/firebaseUtils';
 
 const Jobs = () => {
   const { data } = useCollection<JobListing>('jobs');
+  const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
 
   const mockJobs: JobListing[] = [
     { id: '1', role: "Software Development Intern", company: "Zambia Tech Hub", location: "Remote / Lusaka", salary: "K4,000/mo", type: "Internship", tags: ["React", "Node.js"], postedAt: null },
@@ -77,7 +82,11 @@ const Jobs = () => {
                  </div>
               </div>
               <div className="flex items-center space-x-4">
-                <Button className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]" size="lg">
+                <Button
+                  onClick={() => setSelectedJob(job)}
+                  className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]"
+                  size="lg"
+                >
                   Apply Now
                 </Button>
                 <Button variant="glass" className="p-4 border-white/5">
@@ -88,6 +97,77 @@ const Jobs = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      {/* Application Modal */}
+      <AnimatePresence>
+        {selectedJob && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-lg glass border border-white/10 rounded-[2.5rem] p-10 relative shadow-2xl"
+            >
+              <button
+                onClick={() => { setSelectedJob(null); setCvFile(null); }}
+                className="absolute top-6 right-6 p-2 text-gray-500 hover:text-white transition-colors"
+              >
+                <X size={24} strokeWidth={2.5} />
+              </button>
+
+              <div className="mb-8">
+                <h2 className="text-3xl font-black tracking-tight italic mb-2">Apply <span className="text-primary italic-none">Now</span></h2>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{selectedJob.role} @ {selectedJob.company}</p>
+              </div>
+
+              <form className="space-y-8" onSubmit={async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                try {
+                  let cvUrl = '';
+                  if (cvFile) {
+                    cvUrl = await uploadFile('cvs', cvFile);
+                  }
+                  await applyForJob(selectedJob.id, { cvUrl });
+                  setSelectedJob(null);
+                  setCvFile(null);
+                } catch (err) {
+                  console.error(err);
+                } finally {
+                  setLoading(false);
+                }
+              }}>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Upload CV / Resume</label>
+                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-white/10 rounded-3xl cursor-pointer hover:border-primary/40 hover:bg-white/5 transition-all group">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+                        <FileText size={28} strokeWidth={2.5} />
+                      </div>
+                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest text-center px-6">
+                        {cvFile ? cvFile.name : 'Drop your CV here or click to browse'}
+                      </p>
+                      <p className="text-[9px] text-gray-600 font-bold mt-2 uppercase tracking-tighter">PDF, DOCX (Max 5MB)</p>
+                    </div>
+                    <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={(e) => setCvFile(e.target.files?.[0] || null)} />
+                  </label>
+                </div>
+
+                <div className="bg-primary/5 border border-primary/10 p-6 rounded-2xl">
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    By applying, you agree to share your CampusLink profile and uploaded CV with <span className="text-white font-black">{selectedJob.company}</span>.
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full py-5 text-[10px] uppercase tracking-[0.2em]" isLoading={loading}>
+                  Submit Application
+                </Button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

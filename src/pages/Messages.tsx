@@ -1,18 +1,37 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Send, Phone, Video, Info, MoreVertical, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fadeInUp, slideInLeft, scaleUp } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { onMessagesUpdate, sendMessage } from '../utils/firebaseUtils';
+import { useAuth } from '../context/AuthContext';
 
 const Messages = () => {
+  const { user } = useAuth();
   const [activeChat, setActiveChat] = useState(0);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [inputText, setInputText] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const contacts = [
     { id: 0, name: "Mwaka Mutale", lastMsg: "Is the MacBook still available?", time: "12:45 PM", online: true, avatar: "MM" },
     { id: 1, name: "John Banda (Landlord)", lastMsg: "You can come view the room at 2 PM.", time: "10:30 AM", online: false, avatar: "JB" },
     { id: 2, name: "Zambia Tech Hub", lastMsg: "We have reviewed your application.", time: "Yesterday", online: true, avatar: "ZT" },
   ];
+
+  useEffect(() => {
+    const conversationId = `chat_${activeChat}`;
+    const unsubscribe = onMessagesUpdate(conversationId, (newMessages) => {
+      setMessages(newMessages);
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      }, 100);
+    });
+    return () => unsubscribe();
+  }, [activeChat]);
 
   return (
     <motion.div
@@ -83,41 +102,57 @@ const Messages = () => {
            </div>
         </div>
 
-        <div className="flex-1 p-8 overflow-y-auto space-y-6 no-scrollbar">
-           <AnimatePresence mode="wait">
-             <div key={activeChat} className="space-y-6">
-                <div className="flex justify-start">
-                   <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="max-w-[70%] glass p-4 rounded-3xl rounded-tl-none text-sm font-medium border-white/10 shadow-xl">
-                     Hi! Is the MacBook Pro still available? I'm interested and would like to see it.
-                   </motion.div>
-                </div>
-                <div className="flex justify-end">
-                   <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="max-w-[70%] bg-primary p-4 rounded-3xl rounded-tr-none text-sm font-medium shadow-2xl shadow-primary/20">
-                     Yes, it is! It's in perfect condition. Are you currently on campus?
-                   </motion.div>
-                </div>
-                <div className="flex justify-start">
-                   <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="max-w-[70%] glass p-4 rounded-3xl rounded-tl-none text-sm font-medium border-white/10 shadow-xl">
-                     Yes, I'm at UNZA. Can I see it tomorrow morning?
-                   </motion.div>
-                </div>
-             </div>
+        <div ref={scrollRef} className="flex-1 p-8 overflow-y-auto space-y-6 no-scrollbar">
+           <AnimatePresence initial={false}>
+             {messages.map((msg, i) => (
+               <motion.div
+                 key={msg.id || i}
+                 initial={{ opacity: 0, y: 10 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 className={`flex ${msg.senderId === user?.uid ? 'justify-end' : 'justify-start'}`}
+               >
+                 <div className={`max-w-[70%] p-4 rounded-3xl text-sm font-medium shadow-xl ${
+                   msg.senderId === user?.uid
+                     ? 'bg-primary text-white rounded-tr-none'
+                     : 'glass border-white/10 rounded-tl-none'
+                 }`}>
+                   {msg.text}
+                 </div>
+               </motion.div>
+             ))}
            </AnimatePresence>
         </div>
 
         <div className="p-6 border-t border-white/5 bg-white/2">
-           <div className="flex items-center space-x-4">
+           <form
+             onSubmit={async (e) => {
+               e.preventDefault();
+               if (!inputText.trim()) return;
+               const currentId = `chat_${activeChat}`;
+               const text = inputText;
+               setInputText("");
+               await sendMessage(currentId, text);
+             }}
+             className="flex items-center space-x-4"
+           >
               <div className="flex-1 relative">
-                <input type="text" placeholder="Type your message..." className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-medium outline-none focus:border-primary/50 transition-all shadow-inner" />
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="Type your message..."
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-medium outline-none focus:border-primary/50 transition-all shadow-inner"
+                />
               </div>
               <motion.button
+                type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="p-4 bg-primary rounded-2xl hover:bg-primary-dark transition-all shadow-xl shadow-primary/20 text-white"
               >
                  <Send size={22} strokeWidth={2.5} />
               </motion.button>
-           </div>
+           </form>
         </div>
       </motion.div>
     </motion.div>
