@@ -1,14 +1,23 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles, Sun, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   const handleLogout = async () => {
     await logout();
@@ -21,6 +30,7 @@ const Navbar = () => {
       case 'business': return '/business-dashboard';
       case 'admin': return '/admin-dashboard';
       case 'landlord': return '/business-dashboard';
+      case 'employer': return '/business-dashboard';
       default: return '/dashboard';
     }
   };
@@ -55,6 +65,13 @@ const Navbar = () => {
 
           <div className="h-4 w-px bg-white/10 mx-2" />
 
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="p-2 text-gray-400 hover:text-white transition-colors"
+          >
+            {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+          </button>
+
           {user ? (
             <div className="flex items-center space-x-4">
               <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
@@ -79,7 +96,13 @@ const Navbar = () => {
         </div>
 
         {/* Mobile menu button */}
-        <div className="lg:hidden flex items-center">
+        <div className="lg:hidden flex items-center space-x-4">
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="p-2 text-gray-400 hover:text-white transition-colors"
+          >
+            {isDark ? <Sun size={20} strokeWidth={2.5} /> : <Moon size={20} strokeWidth={2.5} />}
+          </button>
           <button onClick={() => setIsOpen(!isOpen)} className="text-white p-2">
             {isOpen ? <X size={24} strokeWidth={2.5} /> : <Menu size={24} strokeWidth={2.5} />}
           </button>
@@ -98,6 +121,9 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <Link key={link.name} to={link.path} onClick={() => setIsOpen(false)} className="text-sm font-black uppercase tracking-[0.3em]">{link.name}</Link>
             ))}
+            <Link to="/chat" onClick={() => setIsOpen(false)} className="text-sm font-black uppercase tracking-[0.3em] flex items-center text-primary">
+               <Sparkles size={16} className="mr-2" /> AI Assistant
+            </Link>
             <hr className="border-white/5" />
             {user ? (
               <>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
+import { collection, query, onSnapshot } from 'firebase/firestore';
 import { db } from '../utils/firebaseUtils';
 
 export const useCollection = <T>(collectionName: string, constraints: any[] = []) => {
@@ -8,21 +8,22 @@ export const useCollection = <T>(collectionName: string, constraints: any[] = []
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const q = query(collection(db, collectionName), ...constraints);
-        const querySnapshot = await getDocs(q);
-        const result = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+    setLoading(true);
+    const q = query(collection(db, collectionName), ...constraints);
+
+    const unsubscribe = onSnapshot(q,
+      (snapshot) => {
+        const result = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
         setData(result);
-      } catch (err: any) {
+        setLoading(false);
+      },
+      (err) => {
         setError(err);
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    fetchData();
+    return () => unsubscribe();
   }, [collectionName, JSON.stringify(constraints)]);
 
   return { data, loading, error };
