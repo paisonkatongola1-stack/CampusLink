@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, User, Bot, Paperclip, Mic, Sparkles } from 'lucide-react';
+import { Send, User, Bot, Paperclip, Mic, Sparkles, GraduationCap, Briefcase, Home, ShoppingBag } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
 const Chat = () => {
+  const [activeMode, setActiveMode] = useState('General');
   const [messages, setMessages] = useState([
     { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
   ]);
@@ -16,6 +17,13 @@ const Chat = () => {
     }
   }, [messages]);
 
+  const modes = [
+    { name: 'Study', icon: <GraduationCap size={14} />, prompt: "I'm in Study mode. How can I help with your academics?" },
+    { name: 'Career', icon: <Briefcase size={14} />, prompt: "Career mode active. Ready for CV reviews or interview prep." },
+    { name: 'Housing', icon: <Home size={14} />, prompt: "Housing mode. Tell me your budget and preferred campus." },
+    { name: 'Marketplace', icon: <ShoppingBag size={14} />, prompt: "Marketplace assistant here. Looking for fair prices or trending items?" },
+  ];
+
   const handleSend = () => {
     if (!input.trim()) return;
     const newMsgs = [...messages, { role: 'user', text: input }];
@@ -23,9 +31,15 @@ const Chat = () => {
     setInput("");
 
     setTimeout(() => {
+      let response = "I've analyzed your request. Based on current trends in Zambia, here is what I recommend...";
+      if (activeMode === 'Study') response = "I've summarized the key concepts from your notes. Focus on the 'Complexity Analysis' section for your upcoming exam.";
+      if (activeMode === 'Career') response = "Your CV looks great! I suggest adding more quantifiable achievements to your 'Experience' section to stand out to employers.";
+      if (activeMode === 'Housing') response = "There are currently 3 shared rooms available in Silverest under K3,000. Would you like me to book a viewing?";
+      if (activeMode === 'Marketplace') response = "A fair price for a used MacBook Pro M1 in Lusaka is between K12,000 and K15,000 depending on condition.";
+
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: response
       }]);
     }, 1200);
   };
@@ -47,10 +61,17 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+        <motion.div variants={fadeInUp} className="flex flex-wrap gap-2">
+          {modes.map((mode) => (
+            <button
+              key={mode.name}
+              onClick={() => {
+                setActiveMode(mode.name);
+                setMessages([...messages, { role: 'bot', text: mode.prompt }]);
+              }}
+              className={`px-4 py-2 glass border rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center ${activeMode === mode.name ? 'border-primary text-primary bg-primary/5' : 'border-white/5 hover:border-primary/50'}`}
+            >
+              <span className="mr-2">{mode.icon}</span> {mode.name}
             </button>
           ))}
         </motion.div>
@@ -95,7 +116,7 @@ const Chat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask me anything..."
+              placeholder={`Ask the ${activeMode} Assistant anything...`}
               className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-sm font-medium placeholder:text-gray-600"
             />
             <button className="hidden md:flex p-2 text-gray-500 hover:text-white transition-colors mr-3"><Mic size={20} strokeWidth={2.5} /></button>

@@ -1,14 +1,18 @@
 import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, Upload, FileText, X } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
 import { fadeInUp, staggerContainer } from '../utils/animations';
+import { uploadFile } from '../utils/firebaseUtils';
 
 const Jobs = () => {
-  const { data } = useCollection<JobListing>('jobs');
+  const { data, loading: dataLoading } = useCollection<JobListing>('jobs');
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const mockJobs: JobListing[] = [
     { id: '1', role: "Software Development Intern", company: "Zambia Tech Hub", location: "Remote / Lusaka", salary: "K4,000/mo", type: "Internship", tags: ["React", "Node.js"], postedAt: null },
@@ -16,7 +20,24 @@ const Jobs = () => {
     { id: '3', role: "Tutor (Mathematics)", company: "Private Client", location: "Kitwe", salary: "K150/hr", type: "Freelance", tags: ["Education"], postedAt: null },
   ];
 
-  const jobs = data.length > 0 ? data : mockJobs;
+  const jobs = data.length > 0 ? data : (dataLoading ? [] : mockJobs);
+
+  const handleCVUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCvFile(file);
+      setIsUploading(true);
+      try {
+        await uploadFile(`cvs/${Date.now()}_${file.name}`, file);
+        alert("CV uploaded successfully!");
+      } catch (error) {
+        console.error(error);
+        alert("Failed to upload CV");
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
 
   return (
     <motion.div
@@ -24,9 +45,31 @@ const Jobs = () => {
       animate="visible"
       className="max-w-5xl mx-auto px-6 py-10"
     >
-      <div className="mb-16">
-        <motion.h1 variants={fadeInUp} className="text-4xl font-black mb-2 tracking-tight">Job <span className="text-primary">Hub</span></motion.h1>
-        <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Discover career opportunities and student-friendly jobs</motion.p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-16 space-y-8 md:space-y-0">
+        <div>
+          <motion.h1 variants={fadeInUp} className="text-4xl font-black mb-2 tracking-tight">Job <span className="text-primary">Hub</span></motion.h1>
+          <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Discover career opportunities and student-friendly jobs</motion.p>
+        </div>
+
+        <motion.div variants={fadeInUp} className="relative group">
+           <input
+             type="file"
+             accept=".pdf,.doc,.docx"
+             onChange={handleCVUpload}
+             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+           />
+           <div className="glass border border-white/10 rounded-2xl px-6 py-4 flex items-center space-x-4 group-hover:border-primary/50 transition-all">
+              <div className="w-10 h-10 bg-primary/20 text-primary rounded-xl flex items-center justify-center">
+                 {isUploading ? <Clock className="animate-spin" size={20} /> : <Upload size={20} />}
+              </div>
+              <div>
+                 <div className="text-[10px] font-black uppercase tracking-widest text-white">
+                   {cvFile ? cvFile.name : "Upload your CV"}
+                 </div>
+                 <div className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter">Support PDF, DOCX (Max 5MB)</div>
+              </div>
+           </div>
+        </motion.div>
       </div>
 
       <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-16">
