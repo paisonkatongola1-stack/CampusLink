@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
 const Chat = () => {
+  const [mode, setMode] = useState<'Study' | 'Career' | 'Housing' | 'Marketplace'>('Study');
   const [messages, setMessages] = useState([
     { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
   ]);
@@ -23,9 +24,27 @@ const Chat = () => {
     setInput("");
 
     setTimeout(() => {
+      let botResponse = "";
+      switch (mode) {
+        case 'Study':
+          botResponse = "I've analyzed your study notes. Based on the curriculum at Zambian universities, I recommend focusing on these key concepts for your upcoming exams...";
+          break;
+        case 'Career':
+          botResponse = "I've reviewed your request. Your CV looks strong, but for the Zambian job market, consider highlighting more of your local volunteer experience.";
+          break;
+        case 'Housing':
+          botResponse = "I've found 3 new listings near your campus that match your budget of K3,000. Would you like to see them?";
+          break;
+        case 'Marketplace':
+          botResponse = "Based on recent sales, a fair price for a used MacBook Pro M1 in Lusaka would be between K14,000 and K16,000.";
+          break;
+        default:
+          botResponse = "I've analyzed your request. Based on current trends in Zambia, here is what I recommend...";
+      }
+
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: botResponse
       }]);
     }, 1200);
   };
@@ -47,10 +66,16 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+        <motion.div variants={fadeInUp} className="flex flex-wrap gap-2">
+          {['Study', 'Career', 'Housing', 'Marketplace'].map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m as any)}
+              className={`px-4 py-2 border rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center ${
+                mode === m ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-400 hover:border-primary/50'
+              }`}
+            >
+              <Sparkles size={12} strokeWidth={2.5} className={`mr-2 ${mode === m ? 'text-white' : 'text-primary'}`} /> {m}
             </button>
           ))}
         </motion.div>

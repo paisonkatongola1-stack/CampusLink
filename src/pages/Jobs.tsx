@@ -1,14 +1,39 @@
-import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, Upload, X, FileText } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
-import { fadeInUp, staggerContainer } from '../utils/animations';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import { uploadFile, applyForJob, createUserProfile } from '../utils/firebaseUtils';
+import { useAuth } from '../context/AuthContext';
 
 const Jobs = () => {
   const { data } = useCollection<JobListing>('jobs');
+  const { user } = useAuth();
+  const [applyingJob, setApplyingJob] = useState<JobListing | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleApply = async () => {
+    if (!cvFile || !applyingJob || !user) return;
+
+    setIsSubmitting(true);
+    try {
+      const cvUrl = await uploadFile(cvFile, `cvs/${user.uid}/${cvFile.name}`);
+      await applyForJob(applyingJob.id, { cvUrl });
+      await createUserProfile(user.uid, { bio: `CV uploaded: ${cvFile.name}` }); // Simple way to track CV upload
+      setApplyingJob(null);
+      setCvFile(null);
+      alert("Application submitted successfully!");
+    } catch (error) {
+      console.error("Application failed", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const mockJobs: JobListing[] = [
     { id: '1', role: "Software Development Intern", company: "Zambia Tech Hub", location: "Remote / Lusaka", salary: "K4,000/mo", type: "Internship", tags: ["React", "Node.js"], postedAt: null },
@@ -77,7 +102,11 @@ const Jobs = () => {
                  </div>
               </div>
               <div className="flex items-center space-x-4">
-                <Button className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]" size="lg">
+                <Button
+                  onClick={() => setApplyingJob(job)}
+                  className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]"
+                  size="lg"
+                >
                   Apply Now
                 </Button>
                 <Button variant="glass" className="p-4 border-white/5">
@@ -88,6 +117,73 @@ const Jobs = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      {/* Application Modal */}
+      <AnimatePresence>
+        {applyingJob && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setApplyingJob(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-lg relative"
+            >
+              <Card className="p-10" hoverable={false}>
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black tracking-tight">Apply for <span className="text-primary">Role</span></h2>
+                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">{applyingJob.role} @ {applyingJob.company}</p>
+                  </div>
+                  <button onClick={() => setApplyingJob(null)} className="p-2 text-gray-500 hover:text-white transition-colors">
+                    <X size={24} strokeWidth={2.5} />
+                  </button>
+                </div>
+
+                <div className="space-y-8">
+                   <div className="relative group">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={e => setCvFile(e.target.files?.[0] || null)}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="border-2 border-dashed border-white/10 rounded-2xl p-10 text-center group-hover:border-primary transition-all bg-white/2">
+                         {cvFile ? (
+                           <div className="text-primary">
+                              <FileText size={40} className="mx-auto mb-4" />
+                              <p className="text-sm font-bold truncate">{cvFile.name}</p>
+                           </div>
+                         ) : (
+                           <>
+                              <Upload size={40} className="mx-auto mb-4 text-gray-600 group-hover:text-primary transition-colors" />
+                              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Upload your CV (PDF/DOC)</p>
+                           </>
+                         )}
+                      </div>
+                   </div>
+
+                   <Button
+                     onClick={handleApply}
+                     className="w-full py-5 text-[10px] uppercase tracking-[0.2em]"
+                     isLoading={isSubmitting}
+                     disabled={!cvFile}
+                   >
+                     Submit Application
+                   </Button>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

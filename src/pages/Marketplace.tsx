@@ -1,14 +1,50 @@
-import { motion } from 'framer-motion';
-import { Search, ShoppingCart, MapPin, Star, Plus, Tag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ShoppingCart, MapPin, Star, Plus, Tag, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { MarketplaceItem } from '../types';
-import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import { fadeInUp, staggerContainer, hoverScale, scaleUp } from '../utils/animations';
+import { MARKETPLACE_CATEGORIES } from '../utils/constants';
+import { postMarketplaceItem, uploadFile } from '../utils/firebaseUtils';
 
 const Marketplace = () => {
   const { data } = useCollection<MarketplaceItem>('marketplace');
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [newItem, setNewItem] = useState({
+    title: '',
+    price: '',
+    location: '',
+    category: MARKETPLACE_CATEGORIES[0],
+    imageFile: null as File | null
+  });
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItem.imageFile) return;
+
+    setIsUploading(true);
+    try {
+      const imageUrl = await uploadFile(newItem.imageFile, `marketplace/${Date.now()}_${newItem.imageFile.name}`);
+      await postMarketplaceItem({
+        title: newItem.title,
+        price: newItem.price,
+        location: newItem.location,
+        category: newItem.category,
+        image: imageUrl,
+        rating: 0
+      });
+      setShowUploadModal(false);
+      setNewItem({ title: '', price: '', location: '', category: MARKETPLACE_CATEGORIES[0], imageFile: null });
+    } catch (error) {
+      console.error("Upload failed", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const mockItems: MarketplaceItem[] = [
     { id: '1', title: "MacBook Pro M1 2020", price: "K15,000", location: "UNZA", rating: 4.8, category: "Electronics", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80", sellerId: 'user1' },
@@ -94,10 +130,102 @@ const Marketplace = () => {
 
       <motion.button
         {...hoverScale}
+        onClick={() => setShowUploadModal(true)}
         className="fixed bottom-10 right-10 w-16 h-16 bg-accent rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-accent/40 z-40 text-white"
       >
         <Plus size={32} strokeWidth={3} />
       </motion.button>
+
+      {/* Upload Modal */}
+      <AnimatePresence>
+        {showUploadModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowUploadModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-xl relative"
+            >
+              <Card className="p-10" hoverable={false}>
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-2xl font-black tracking-tight">Post <span className="text-primary">Listing</span></h2>
+                  <button onClick={() => setShowUploadModal(false)} className="p-2 text-gray-500 hover:text-white transition-colors">
+                    <X size={24} strokeWidth={2.5} />
+                  </button>
+                </div>
+
+                <form onSubmit={handleUpload} className="space-y-6">
+                  <Input
+                    label="Item Title"
+                    placeholder="e.g. MacBook Pro M1"
+                    value={newItem.title}
+                    onChange={e => setNewItem({ ...newItem, title: e.target.value })}
+                    required
+                  />
+                  <div className="grid grid-cols-2 gap-6">
+                    <Input
+                      label="Price (ZMW)"
+                      placeholder="e.g. K15,000"
+                      value={newItem.price}
+                      onChange={e => setNewItem({ ...newItem, price: e.target.value })}
+                      required
+                    />
+                    <Input
+                      label="Location"
+                      placeholder="e.g. UNZA"
+                      value={newItem.location}
+                      onChange={e => setNewItem({ ...newItem, location: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 block">Category</label>
+                    <select
+                      className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-medium outline-none focus:border-primary transition-all appearance-none"
+                      value={newItem.category}
+                      onChange={e => setNewItem({ ...newItem, category: e.target.value as any })}
+                    >
+                      {MARKETPLACE_CATEGORIES.map(cat => (
+                        <option key={cat} value={cat} className="bg-[#0A0B14]">{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="relative group">
+                     <input
+                       type="file"
+                       accept="image/*"
+                       onChange={e => setNewItem({ ...newItem, imageFile: e.target.files?.[0] || null })}
+                       className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                       required
+                     />
+                     <div className="border-2 border-dashed border-white/10 rounded-2xl p-8 text-center group-hover:border-primary transition-all bg-white/2">
+                        <ImageIcon size={32} className="mx-auto mb-3 text-gray-500 group-hover:text-primary transition-colors" />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                          {newItem.imageFile ? newItem.imageFile.name : "Select Product Image"}
+                        </p>
+                     </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full py-5 text-[10px] uppercase tracking-[0.2em]"
+                    isLoading={isUploading}
+                  >
+                    {isUploading ? "Uploading..." : "Post Item"}
+                  </Button>
+                </form>
+              </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

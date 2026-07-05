@@ -1,4 +1,6 @@
-export type UserRole = 'student' | 'business' | 'landlord' | 'employer' | 'admin';
+import { ROLES, JOB_TYPES, MARKETPLACE_CATEGORIES } from '../utils/constants';
+
+export type UserRole = typeof ROLES[number];
 
 export interface UserProfile {
   uid: string;
@@ -31,7 +33,7 @@ export interface JobListing {
   company: string;
   location: string;
   salary: string;
-  type: 'Internship' | 'Part-time' | 'Full-time' | 'Freelance';
+  type: typeof JOB_TYPES[number];
   tags: string[];
   postedAt: any;
 }
@@ -42,7 +44,7 @@ export interface MarketplaceItem {
   price: string;
   location: string;
   rating: number;
-  category: string;
+  category: typeof MARKETPLACE_CATEGORIES[number];
   image: string;
   sellerId: string;
 }

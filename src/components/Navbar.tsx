@@ -1,12 +1,13 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles, Moon, Sun } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,6 +15,14 @@ const Navbar = () => {
     await logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   const getDashboardLink = () => {
     if (!profile) return '/dashboard';
@@ -57,6 +66,12 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="text-gray-400 hover:text-white transition-colors p-2"
+              >
+                {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+              </button>
               <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
                 <Sparkles size={18} strokeWidth={2.5} />
               </Link>
