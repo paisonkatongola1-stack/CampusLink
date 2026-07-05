@@ -1,17 +1,51 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Send, Phone, Video, Info, MoreVertical, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { fadeInUp, slideInLeft, scaleUp } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { useCollection } from '../hooks/useData';
+import { useAuth } from '../context/AuthContext';
+import { where, orderBy } from 'firebase/firestore';
+import { sendMessage, onMessagesUpdate } from '../utils/firebaseUtils';
 
 const Messages = () => {
-  const [activeChat, setActiveChat] = useState(0);
+  const { user } = useAuth();
+  const { data: conversations } = useCollection<any>('conversations', [
+    where('participantIds', 'array-contains', user?.uid || '')
+  ]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [inputText, setInputText] = useState("");
 
-  const contacts = [
-    { id: 0, name: "Mwaka Mutale", lastMsg: "Is the MacBook still available?", time: "12:45 PM", online: true, avatar: "MM" },
-    { id: 1, name: "John Banda (Landlord)", lastMsg: "You can come view the room at 2 PM.", time: "10:30 AM", online: false, avatar: "JB" },
-    { id: 2, name: "Zambia Tech Hub", lastMsg: "We have reviewed your application.", time: "Yesterday", online: true, avatar: "ZT" },
+  useEffect(() => {
+    if (activeChatId) {
+      const unsubscribe = onMessagesUpdate(activeChatId, (msgs) => {
+        setMessages(msgs);
+      });
+      return () => unsubscribe();
+    }
+  }, [activeChatId]);
+
+  const handleSend = async () => {
+    if (!inputText.trim() || !activeChatId) return;
+    await sendMessage(activeChatId, inputText);
+    setInputText("");
+  };
+
+  const activeChat = conversations.find(c => c.id === activeChatId) || conversations[0];
+
+  const contacts = conversations.length > 0 ? conversations.map(c => ({
+    id: c.id,
+    name: c.participantNames?.find((n: string) => n !== user?.displayName) || "User",
+    lastMsg: c.lastMessage || "",
+    time: c.updatedAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || "",
+    online: true,
+    avatar: (c.participantNames?.find((n: string) => n !== user?.displayName) || "U").substring(0, 2).toUpperCase()
+  })) : [
+    { id: '0', name: "Mwaka Mutale", lastMsg: "Is the MacBook still available?", time: "12:45 PM", online: true, avatar: "MM" },
+    { id: '1', name: "John Banda (Landlord)", lastMsg: "You can come view the room at 2 PM.", time: "10:30 AM", online: false, avatar: "JB" },
+    { id: '2', name: "Zambia Tech Hub", lastMsg: "We have reviewed your application.", time: "Yesterday", online: true, avatar: "ZT" },
   ];
 
   return (
@@ -38,8 +72,8 @@ const Messages = () => {
           {contacts.map((contact) => (
             <button
               key={contact.id}
-              onClick={() => setActiveChat(contact.id)}
-              className={`w-full p-6 flex items-center space-x-5 border-b border-white/5 transition-all ${activeChat === contact.id ? 'bg-primary/10 border-l-4 border-l-primary' : 'hover:bg-white/5'}`}
+              onClick={() => setActiveChatId(contact.id)}
+              className={`w-full p-6 flex items-center space-x-5 border-b border-white/5 transition-all ${activeChatId === contact.id ? 'bg-primary/10 border-l-4 border-l-primary' : 'hover:bg-white/5'}`}
             >
               <div className="relative">
                 <div className="w-14 h-14 bg-surface-bright rounded-2xl flex items-center justify-center font-black text-sm border border-white/10 shadow-lg">
@@ -64,10 +98,12 @@ const Messages = () => {
         <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/2">
            <div className="flex items-center space-x-5">
               <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary font-black border border-primary/20 shadow-lg">
-                 {contacts[activeChat].avatar}
+                 {activeChat ? (activeChat.participantNames?.find((n: string) => n !== user?.displayName) || "U").substring(0, 2).toUpperCase() : "U"}
               </div>
               <div>
-                 <h3 className="font-bold text-base tracking-tight">{contacts[activeChat].name}</h3>
+                 <h3 className="font-bold text-base tracking-tight">
+                    {activeChat ? (activeChat.participantNames?.find((n: string) => n !== user?.displayName) || "User") : "Select a chat"}
+                 </h3>
                  <div className="flex items-center space-x-1.5">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                     <p className="text-[10px] text-green-500 font-black uppercase tracking-widest">Active Now</p>
@@ -85,22 +121,24 @@ const Messages = () => {
 
         <div className="flex-1 p-8 overflow-y-auto space-y-6 no-scrollbar">
            <AnimatePresence mode="wait">
-             <div key={activeChat} className="space-y-6">
-                <div className="flex justify-start">
-                   <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="max-w-[70%] glass p-4 rounded-3xl rounded-tl-none text-sm font-medium border-white/10 shadow-xl">
-                     Hi! Is the MacBook Pro still available? I'm interested and would like to see it.
-                   </motion.div>
-                </div>
-                <div className="flex justify-end">
-                   <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="max-w-[70%] bg-primary p-4 rounded-3xl rounded-tr-none text-sm font-medium shadow-2xl shadow-primary/20">
-                     Yes, it is! It's in perfect condition. Are you currently on campus?
-                   </motion.div>
-                </div>
-                <div className="flex justify-start">
-                   <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="max-w-[70%] glass p-4 rounded-3xl rounded-tl-none text-sm font-medium border-white/10 shadow-xl">
-                     Yes, I'm at UNZA. Can I see it tomorrow morning?
-                   </motion.div>
-                </div>
+             <div key={activeChatId || 'empty'} className="space-y-6">
+                {messages.length > 0 ? messages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.senderId === user?.uid ? 'justify-end' : 'justify-start'}`}>
+                    <motion.div
+                      initial={{ opacity: 0, x: msg.senderId === user?.uid ? 10 : -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`max-w-[70%] p-4 rounded-3xl text-sm font-medium shadow-xl ${
+                        msg.senderId === user?.uid ? 'bg-primary rounded-tr-none shadow-primary/20' : 'glass rounded-tl-none border-white/10'
+                      }`}
+                    >
+                      {msg.text}
+                    </motion.div>
+                  </div>
+                )) : (
+                  <div className="text-center text-gray-500 text-xs font-black uppercase tracking-[0.3em] mt-20">
+                    No messages yet. Start the conversation!
+                  </div>
+                )}
              </div>
            </AnimatePresence>
         </div>
@@ -108,11 +146,19 @@ const Messages = () => {
         <div className="p-6 border-t border-white/5 bg-white/2">
            <div className="flex items-center space-x-4">
               <div className="flex-1 relative">
-                <input type="text" placeholder="Type your message..." className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-medium outline-none focus:border-primary/50 transition-all shadow-inner" />
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={e => setInputText(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && handleSend()}
+                  placeholder="Type your message..."
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm font-medium outline-none focus:border-primary/50 transition-all shadow-inner"
+                />
               </div>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={handleSend}
                 className="p-4 bg-primary rounded-2xl hover:bg-primary-dark transition-all shadow-xl shadow-primary/20 text-white"
               >
                  <Send size={22} strokeWidth={2.5} />
