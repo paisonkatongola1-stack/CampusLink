@@ -2,14 +2,14 @@ import { motion } from 'framer-motion';
 import {
   LayoutDashboard, User, Home, ShoppingBag,
   Briefcase, Calendar, MessageSquare, Cpu,
-  Settings, Bell, Search, MapPin, CheckCircle
+  Settings, Bell, Search, MapPin, CheckCircle, Award
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/ui/Sidebar';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import { fadeInUp, staggerContainer } from '../utils/animations';
 
 const StudentDashboard = () => {
   const { profile } = useAuth();
@@ -60,7 +60,7 @@ const StudentDashboard = () => {
           <Card className="p-10 flex flex-col md:flex-row items-center md:items-start space-y-8 md:space-y-0 md:space-x-10 relative overflow-hidden" hoverable={false}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32 rounded-full" />
 
-            <div className="w-28 h-24 bg-gradient-to-br from-primary to-blue-700 rounded-3xl flex items-center justify-center text-4xl font-black shadow-2xl shadow-primary/20 z-10">
+            <div className="w-28 h-24 bg-gradient-to-br from-primary to-blue-700 rounded-3xl flex items-center justify-center text-4xl font-black shadow-2xl shadow-primary/20 z-10 uppercase">
               {profile?.displayName?.substring(0, 2).toUpperCase() || 'ST'}
             </div>
 
@@ -70,12 +70,15 @@ const StudentDashboard = () => {
                 <div className="ml-3 p-1 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
                   <CheckCircle size={12} strokeWidth={4} className="text-white" />
                 </div>
+                <div className="ml-2 p-1 bg-accent rounded-full flex items-center justify-center shadow-lg shadow-accent/30">
+                  <Award size={12} strokeWidth={2.5} className="text-white" />
+                </div>
               </h2>
               <p className="text-primary font-bold text-sm mt-2 uppercase tracking-widest">{profile?.university || 'University of Zambia (UNZA)'}</p>
-              <p className="text-gray-400 text-xs mt-1 font-medium italic opacity-80">{profile?.course || 'Bachelor of Computer Science'}</p>
+              <p className="text-gray-400 text-xs mt-1 font-medium italic opacity-80">{profile?.course || 'Bachelor of Computer Science'} • Year {profile?.year || '3'}</p>
 
               <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-6">
-                {['React.js', 'Python', 'UI/UX Design'].map(skill => (
+                {(profile?.skills || ['React.js', 'Python', 'UI/UX Design']).map(skill => (
                   <span key={skill} className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-xl text-[10px] text-gray-300 font-black uppercase tracking-widest hover:border-primary/40 transition-colors cursor-default">{skill}</span>
                 ))}
               </div>

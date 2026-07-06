@@ -9,16 +9,16 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
-  Timestamp
+  Timestamp,
+  onSnapshot,
+  orderBy
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../firebase";
 import { UserProfile, AccommodationListing, JobListing, MarketplaceItem } from "../types";
 
-// Note: In a real environment with Data Connect, we would use the generated SDK.
-// Since we are setting up the schema/operations, we'll keep the Firestore implementation
-// as the primary data store for the MVP, but aligned with the new schema.
-
 const db = getFirestore();
+const storage = getStorage();
 
 export const createUserProfile = async (userId: string, data: Partial<UserProfile>) => {
   return await setDoc(doc(db, "users", userId), data);
@@ -38,6 +38,7 @@ export const postMarketplaceItem = async (data: Partial<MarketplaceItem>) => {
   return await addDoc(collection(db, "marketplace"), {
     ...data,
     sellerId: auth.currentUser?.uid,
+    status: 'pending',
     createdAt: Timestamp.now()
   });
 };
@@ -50,6 +51,49 @@ export const applyForJob = async (jobId: string, applicantData: any) => {
     status: "pending",
     appliedAt: Timestamp.now()
   });
+};
+
+// Messaging
+export const sendMessage = async (conversationId: string, text: string) => {
+  if (!auth.currentUser) return;
+  return await addDoc(collection(db, "conversations", conversationId, "messages"), {
+    text,
+    senderId: auth.currentUser.uid,
+    createdAt: Timestamp.now()
+  });
+};
+
+export const onMessagesUpdate = (conversationId: string, callback: (messages: any[]) => void) => {
+  const q = query(
+    collection(db, "conversations", conversationId, "messages"),
+    orderBy("createdAt", "asc")
+  );
+  return onSnapshot(q, (snapshot) => {
+    const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(messages);
+  });
+};
+
+// Storage
+export const uploadFile = async (path: string, file: File) => {
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+};
+
+// Favorites
+export const saveItem = async (collectionName: string, itemId: string) => {
+  if (!auth.currentUser) return;
+  return await addDoc(collection(db, "saved_items"), {
+    userId: auth.currentUser.uid,
+    itemId,
+    collectionName,
+    savedAt: Timestamp.now()
+  });
+};
+
+export const unsaveItem = async (saveId: string) => {
+  return await deleteDoc(doc(db, "saved_items", saveId));
 };
 
 export { db };

@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
-import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle } from 'lucide-react';
+import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle, Award, ShieldCheck } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
+  const { profile } = useAuth();
+
   return (
     <motion.div
       initial="hidden"
@@ -17,9 +20,9 @@ const Profile = () => {
         </div>
         <div className="absolute -bottom-12 left-10 flex flex-col md:flex-row md:items-end">
           <div className="relative group">
-            <div className="w-40 h-40 rounded-[2.5rem] border-[6px] border-[#0A0B14] bg-surface-bright flex items-center justify-center text-5xl font-black shadow-2xl z-20 overflow-hidden">
+            <div className="w-40 h-40 rounded-[2.5rem] border-[6px] border-[#0A0B14] bg-surface-bright flex items-center justify-center text-5xl font-black shadow-2xl z-20 overflow-hidden uppercase">
                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
-               CM
+               {profile?.displayName?.substring(0, 2) || 'CM'}
             </div>
             <motion.button whileHover={{ scale: 1.1 }} className="absolute bottom-2 right-2 p-3 bg-primary rounded-2xl shadow-2xl border-4 border-[#0A0B14] z-30">
               <Camera size={20} strokeWidth={2.5} className="text-white" />
@@ -27,12 +30,17 @@ const Profile = () => {
           </div>
           <div className="mt-4 md:ml-8 md:mb-4">
             <h1 className="text-4xl font-black flex items-center tracking-tight">
-              Chanda Musonda
+              {profile?.displayName || 'Chanda Musonda'}
               <div className="ml-3 p-1.5 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
                 <CheckCircle size={14} strokeWidth={4} className="text-white" />
               </div>
+              <div className="ml-2 p-1.5 bg-accent rounded-full flex items-center justify-center shadow-lg shadow-accent/20">
+                <Award size={14} strokeWidth={2.5} className="text-white" />
+              </div>
             </h1>
-            <p className="text-primary font-black uppercase tracking-[0.2em] text-xs mt-1">@chanda_dev • Computer Science Student</p>
+            <p className="text-primary font-black uppercase tracking-[0.2em] text-xs mt-1">
+              @{profile?.displayName?.toLowerCase().replace(' ', '_') || 'chanda_dev'} • {profile?.role.toUpperCase()}
+            </p>
           </div>
         </div>
         <motion.div whileHover={{ scale: 1.05 }} className="absolute -bottom-6 right-6 md:bottom-4 md:right-10">
@@ -49,16 +57,19 @@ const Profile = () => {
         <motion.div variants={fadeInUp} className="md:col-span-1 space-y-8">
            <Card className="p-8 relative overflow-hidden" hoverable={false}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
-              <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-8">Personal Details</h3>
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500">Personal Details</h3>
+                <ShieldCheck size={16} className="text-green-500" />
+              </div>
               <div className="space-y-6">
                  {[
-                   { icon: <GraduationCap size={18} strokeWidth={2.5} />, label: "University of Zambia" },
-                   { icon: <Mail size={18} strokeWidth={2.5} />, label: "chanda@unza.zm" },
+                   { icon: <GraduationCap size={18} strokeWidth={2.5} />, label: profile?.university || "University of Zambia" },
+                   { icon: <Mail size={18} strokeWidth={2.5} />, label: profile?.email || "chanda@unza.zm" },
                    { icon: <MapPin size={18} strokeWidth={2.5} />, label: "Lusaka, Zambia" },
                  ].map((item, i) => (
                    <div key={i} className="flex items-center space-x-4 text-sm font-bold text-gray-300">
                      <div className="p-2 bg-primary/10 rounded-xl text-primary">{item.icon}</div>
-                     <span>{item.label}</span>
+                     <span className="truncate">{item.label}</span>
                    </div>
                  ))}
               </div>
@@ -67,7 +78,7 @@ const Profile = () => {
            <Card className="p-8" hoverable={false}>
               <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-6">Expertise</h3>
               <div className="flex flex-wrap gap-2">
-                {['React', 'TypeScript', 'Node.js', 'Python', 'UI/UX'].map(s => (
+                {(profile?.skills || ['React', 'TypeScript', 'Node.js', 'Python', 'UI/UX']).map(s => (
                   <span key={s} className="px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20 hover:bg-primary hover:text-white transition-all cursor-default">{s}</span>
                 ))}
               </div>
@@ -79,7 +90,7 @@ const Profile = () => {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent" />
               <h3 className="text-2xl font-bold mb-6 tracking-tight">Biography</h3>
               <p className="text-gray-400 text-base leading-relaxed font-medium">
-                I'm a dedicated Computer Science student at UNZA with a passion for building innovative digital solutions that address the unique challenges faced by Zambian students. I specialize in frontend development with React and have a keen eye for UI/UX design. Currently seeking internship opportunities to apply my skills in real-world projects.
+                {profile?.bio || "I'm a dedicated Computer Science student at UNZA with a passion for building innovative digital solutions that address the unique challenges faced by Zambian students. I specialize in frontend development with React and have a keen eye for UI/UX design. Currently seeking internship opportunities to apply my skills in real-world projects."}
               </p>
            </Card>
 
