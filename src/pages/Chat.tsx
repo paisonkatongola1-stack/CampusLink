@@ -3,11 +3,14 @@ import { Send, User, Bot, Paperclip, Mic, Sparkles } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
+type Mode = 'Study' | 'Career' | 'Housing' | 'Marketplace';
+
 const Chat = () => {
   const [messages, setMessages] = useState([
     { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
   ]);
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState<Mode>('Study');
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,6 +18,16 @@ const Chat = () => {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const getBotResponse = (userInput: string, currentMode: Mode) => {
+    const responses: Record<Mode, string> = {
+      Study: "I've analyzed your study materials. For your upcoming exams at UNZA, I recommend focusing on these key concepts. Would you like me to generate some quiz questions for you?",
+      Career: "Based on your profile, I've reviewed your CV. Your skills in React are impressive! I found 3 internship opportunities at Zambia Tech Hub that match your background.",
+      Housing: "I found several rooms near CBU Riverside area that fit your budget of K3,000. Would you like to see the virtual tours for Silverest Lodge?",
+      Marketplace: "That's a great item! Based on recent sales at Mulungushi University, a fair price for a used MacBook Pro M1 would be between K14,000 and K16,000."
+    };
+    return responses[currentMode];
+  };
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -25,7 +38,7 @@ const Chat = () => {
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: getBotResponse(input, mode)
       }]);
     }, 1200);
   };
@@ -48,9 +61,17 @@ const Chat = () => {
         </div>
 
         <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+          {(['Study', 'Career', 'Housing', 'Marketplace'] as Mode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center border ${
+                mode === m
+                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                : 'glass border-white/5 text-gray-500 hover:border-primary/50'
+              }`}
+            >
+              <Sparkles size={12} strokeWidth={2.5} className={`mr-2 ${mode === m ? 'text-white' : 'text-primary'}`} /> {m}
             </button>
           ))}
         </motion.div>
@@ -95,7 +116,7 @@ const Chat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask me anything..."
+              placeholder={`Ask me about ${mode.toLowerCase()}...`}
               className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-sm font-medium placeholder:text-gray-600"
             />
             <button className="hidden md:flex p-2 text-gray-500 hover:text-white transition-colors mr-3"><Mic size={20} strokeWidth={2.5} /></button>
