@@ -8,6 +8,7 @@ const Chat = () => {
     { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
   ]);
   const [input, setInput] = useState("");
+  const [activeMode, setActiveMode] = useState('Study');
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -16,18 +17,34 @@ const Chat = () => {
     }
   }, [messages]);
 
+  const getModeResponse = (mode: string, text: string) => {
+    switch (mode) {
+      case 'Study':
+        return "I've analyzed your study-related query. Based on common curriculum standards at Zambian universities like UNZA and CBU, I recommend focusing on these key concepts... Would you like me to generate a quick summary or some practice quiz questions for you?";
+      case 'Career':
+        return "Regarding your career goals, I've cross-referenced your profile with current internship trends in Zambia. Your skills in React and Python are highly sought after. I suggest highlighting your recent projects in your CV. Would you like a detailed CV review?";
+      case 'Housing':
+        return "I've searched our latest listings for accommodation near your campus. There are currently 5 highly-rated rooms within your preferred price range. I recommend Silverest Executive Lodge for its consistent power and security. Would you like to see more details?";
+      case 'Marketplace':
+        return "Checking the marketplace for fair pricing... Based on recent sales of similar electronics, a fair price for that item would be between K3,500 and K4,200. Would you like me to help you draft an attractive listing description?";
+      default:
+        return "I'm here to help! Could you provide more details about your request so I can give you the best possible assistance?";
+    }
+  };
+
   const handleSend = () => {
     if (!input.trim()) return;
-    const newMsgs = [...messages, { role: 'user', text: input }];
-    setMessages(newMsgs);
+    const userMsg = { role: 'user', text: input };
+    setMessages(prev => [...prev, userMsg]);
     setInput("");
 
     setTimeout(() => {
+      const botResponse = getModeResponse(activeMode, input);
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: botResponse
       }]);
-    }, 1200);
+    }, 1000);
   };
 
   return (
@@ -44,12 +61,16 @@ const Chat = () => {
             </div>
             <h1 className="text-4xl font-black tracking-tight">Campus<span className="text-primary">AI</span></h1>
           </motion.div>
-          <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
+          <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal {activeMode.toLowerCase()} partner</motion.p>
         </div>
 
         <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
+          {['Study', 'Career', 'Housing', 'Marketplace'].map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setActiveMode(mode)}
+              className={`px-4 py-2 glass border rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center ${activeMode === mode ? 'border-primary text-primary bg-primary/5' : 'border-white/5 hover:border-primary/50'}`}
+            >
               <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
             </button>
           ))}
@@ -95,7 +116,7 @@ const Chat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask me anything..."
+              placeholder={`Ask our ${activeMode} AI anything...`}
               className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-sm font-medium placeholder:text-gray-600"
             />
             <button className="hidden md:flex p-2 text-gray-500 hover:text-white transition-colors mr-3"><Mic size={20} strokeWidth={2.5} /></button>
