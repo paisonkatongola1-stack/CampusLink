@@ -1,13 +1,18 @@
-import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, Upload, X } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
-import { fadeInUp, staggerContainer } from '../utils/animations';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import { JOB_TYPES } from '../utils/constants';
 
 const Jobs = () => {
+  const [activeType, setActiveType] = useState('All');
+  const [showUploadCV, setShowUploadCV] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const { data } = useCollection<JobListing>('jobs');
 
   const mockJobs: JobListing[] = [
@@ -16,7 +21,18 @@ const Jobs = () => {
     { id: '3', role: "Tutor (Mathematics)", company: "Private Client", location: "Kitwe", salary: "K150/hr", type: "Freelance", tags: ["Education"], postedAt: null },
   ];
 
-  const jobs = data.length > 0 ? data : mockJobs;
+  const jobsSource = data.length > 0 ? data : mockJobs;
+  const jobs = activeType === 'All' ? jobsSource : jobsSource.filter(j => j.type === activeType);
+
+  const handleCVUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploadLoading(true);
+    // Simulate upload
+    setTimeout(() => {
+      setUploadLoading(false);
+      setShowUploadCV(false);
+    }, 1500);
+  };
 
   return (
     <motion.div
@@ -24,9 +40,16 @@ const Jobs = () => {
       animate="visible"
       className="max-w-5xl mx-auto px-6 py-10"
     >
-      <div className="mb-16">
-        <motion.h1 variants={fadeInUp} className="text-4xl font-black mb-2 tracking-tight">Job <span className="text-primary">Hub</span></motion.h1>
-        <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Discover career opportunities and student-friendly jobs</motion.p>
+      <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between space-y-6 md:space-y-0">
+        <div>
+          <motion.h1 variants={fadeInUp} className="text-4xl font-black mb-2 tracking-tight">Job <span className="text-primary">Hub</span></motion.h1>
+          <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px]">Discover career opportunities and student-friendly jobs</motion.p>
+        </div>
+        <motion.div variants={fadeInUp}>
+          <Button onClick={() => setShowUploadCV(true)} variant="glass" className="border-primary/20 text-primary hover:bg-primary hover:text-white">
+            <Upload size={18} className="mr-2" /> Upload CV
+          </Button>
+        </motion.div>
       </div>
 
       <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-16">
@@ -51,15 +74,23 @@ const Jobs = () => {
          <div className="flex-1">
             <Input placeholder="Search roles or companies..." icon={<Search size={20} strokeWidth={2.5} />} className="shadow-2xl" />
          </div>
-         <div className="flex space-x-2">
-           {['Internship', 'Part-time', 'Remote'].map(f => (
-             <Button key={f} variant="glass" size="sm" className="text-[10px] font-black uppercase tracking-[0.2em] border-white/5">{f}</Button>
+         <div className="flex space-x-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+           {['All', ...JOB_TYPES].map(f => (
+             <Button
+               key={f}
+               variant={activeType === f ? 'primary' : 'glass'}
+               size="sm"
+               onClick={() => setActiveType(f)}
+               className="text-[10px] font-black uppercase tracking-[0.2em] border-white/5 whitespace-nowrap"
+             >
+               {f}
+             </Button>
            ))}
          </div>
       </motion.div>
 
       <motion.div variants={staggerContainer} className="space-y-6">
-        {jobs.map((job, i) => (
+        {jobs.map((job) => (
           <motion.div key={job.id} variants={fadeInUp} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
             <Card className="p-8 flex flex-col md:flex-row md:items-center justify-between space-y-8 md:space-y-0">
               <div className="flex items-center space-x-8">
@@ -88,6 +119,34 @@ const Jobs = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      {/* CV Upload Modal */}
+      <AnimatePresence>
+        {showUploadCV && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowUploadCV(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <motion.div variants={scaleUp} initial="hidden" animate="visible" exit="hidden" className="w-full max-w-lg glass border border-white/10 rounded-[2.5rem] p-10 relative z-10">
+              <button onClick={() => setShowUploadCV(false)} className="absolute top-8 right-8 text-gray-500 hover:text-white"><X size={24} strokeWidth={2.5} /></button>
+              <h2 className="text-3xl font-black mb-2 tracking-tight">Upload <span className="text-primary">CV</span></h2>
+              <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-10">Get noticed by top employers in Zambia</p>
+
+              <form onSubmit={handleCVUpload} className="space-y-8">
+                <div className="border-2 border-dashed border-white/10 rounded-[2rem] p-12 text-center hover:border-primary/40 transition-all cursor-pointer group bg-white/2">
+                   <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary group-hover:scale-110 transition-transform shadow-xl shadow-primary/5">
+                      <Upload size={28} strokeWidth={2.5} />
+                   </div>
+                   <p className="text-sm font-bold text-gray-300 mb-2">Drag and drop your CV here</p>
+                   <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Supported formats: PDF, DOCX (Max 5MB)</p>
+                </div>
+
+                <Button type="submit" className="w-full py-5 text-[10px] font-black uppercase tracking-[0.2em]" isLoading={uploadLoading}>
+                  Save to Profile
+                </Button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
