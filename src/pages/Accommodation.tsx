@@ -1,14 +1,19 @@
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Heart } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { AccommodationListing } from '../types';
 import { fadeInUp, staggerContainer } from '../utils/animations';
+import { saveItem, unsaveItem } from '../utils/firebaseUtils';
+import { useAuth } from '../context/AuthContext';
 
 const Accommodation = () => {
+  const { profile } = useAuth();
   const { data } = useCollection<AccommodationListing>('accommodation');
+  const [activeFilter, setActiveFilter] = useState('All');
 
   const mockListings: AccommodationListing[] = [
     {
@@ -35,13 +40,36 @@ const Accommodation = () => {
     },
   ];
 
-  const listings = data.length > 0 ? data : mockListings;
+  const listingsSource = data.length > 0 ? data : mockListings;
+
+  const filteredListings = listingsSource.filter(item => {
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Under K3,000') {
+      const priceVal = parseInt(item.price.replace(/[^\d]/g, ''));
+      return priceVal < 3000;
+    }
+    if (activeFilter === 'UNZA Area') return item.university === 'UNZA';
+    if (activeFilter === 'CBU Area') return item.university === 'CBU';
+    if (activeFilter === 'Mulungushi') return item.university.includes('Mulungushi');
+    if (activeFilter === 'Self-contained') return item.amenities.includes('self-contained');
+    return true;
+  });
 
   const amenityIcons: any = {
     wifi: <Wifi size={14} strokeWidth={2.5} />,
     power: <Zap size={14} strokeWidth={2.5} />,
     security: <ShieldCheck size={14} strokeWidth={2.5} />,
     water: <Wind size={14} strokeWidth={2.5} />,
+  };
+
+  const handleToggleSave = async (id: string) => {
+    if (!profile) return;
+    const isSaved = (profile as any).saved_accommodation?.includes(id);
+    if (isSaved) {
+      await unsaveItem('accommodation', id);
+    } else {
+      await saveItem('accommodation', id);
+    }
   };
 
   return (
@@ -68,8 +96,12 @@ const Accommodation = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
-        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter, i) => (
-          <button key={i} className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}>
+        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeFilter === filter ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}
+          >
             {filter}
           </button>
         ))}
@@ -79,7 +111,7 @@ const Accommodation = () => {
         variants={staggerContainer}
         className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
       >
-        {listings.map((item, i) => (
+        {filteredListings.map((item) => (
           <motion.div
             key={item.id}
             variants={fadeInUp}
@@ -91,6 +123,16 @@ const Accommodation = () => {
                 <div className="absolute top-6 right-6 bg-primary/90 backdrop-blur-xl text-white font-black px-4 py-2 rounded-xl text-sm shadow-2xl border border-white/10">
                   {item.price}<span className="text-[10px] font-normal text-white/70">/mo</span>
                 </div>
+                <button
+                  onClick={() => handleToggleSave(item.id)}
+                  className={`absolute top-6 left-6 p-2.5 rounded-xl backdrop-blur-xl border border-white/10 transition-all ${
+                    (profile as any)?.saved_accommodation?.includes(item.id)
+                    ? 'bg-accent text-white border-accent'
+                    : 'bg-black/40 text-white hover:bg-accent'
+                  }`}
+                >
+                  <Heart size={18} strokeWidth={2.5} className={(profile as any)?.saved_accommodation?.includes(item.id) ? 'fill-current' : ''} />
+                </button>
               </div>
               <div className="p-8">
                 <div className="flex justify-between items-start mb-3">

@@ -1,11 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, User, Bot, Paperclip, Mic, Sparkles } from 'lucide-react';
+import { Send, User, Bot, Paperclip, Mic, Sparkles, BookOpen, Briefcase, Home, ShoppingBag } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
+type AIMode = 'Study' | 'Career' | 'Housing' | 'Marketplace';
+
 const Chat = () => {
+  const [activeMode, setActiveMode] = useState<AIMode>('Study');
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
+    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I'm currently in Study Mode. I can help you summarize notes or explain complex concepts. You can switch modes above for specialized help!" }
   ]);
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -18,17 +21,36 @@ const Chat = () => {
 
   const handleSend = () => {
     if (!input.trim()) return;
-    const newMsgs = [...messages, { role: 'user', text: input }];
-    setMessages(newMsgs);
+    const userMsg = { role: 'user', text: input };
+    setMessages(prev => [...prev, userMsg]);
     setInput("");
 
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
-      }]);
+      let botResponse = "";
+      switch (activeMode) {
+        case 'Study':
+          botResponse = "I've analyzed your study query. Based on common curricula at UNZA and CBU, here's a simplified explanation...";
+          break;
+        case 'Career':
+          botResponse = "Your career goals look promising! I recommend updating your CV with more focus on the skills you mentioned. Would you like an interview prep checklist?";
+          break;
+        case 'Housing':
+          botResponse = "Finding the right place is crucial. Based on your preferences, I suggest looking at 'Silverest' or 'Riverside' areas. They are currently trending for students.";
+          break;
+        case 'Marketplace':
+          botResponse = "That's a fair request. For a used MacBook in Zambia, K12,000 to K15,000 is a competitive price range. Make sure to check the battery cycle count!";
+          break;
+      }
+      setMessages(prev => [...prev, { role: 'bot', text: botResponse }]);
     }, 1200);
   };
+
+  const modes: { id: AIMode, icon: any }[] = [
+    { id: 'Study', icon: <BookOpen size={14} /> },
+    { id: 'Career', icon: <Briefcase size={14} /> },
+    { id: 'Housing', icon: <Home size={14} /> },
+    { id: 'Marketplace', icon: <ShoppingBag size={14} /> },
+  ];
 
   return (
     <motion.div
@@ -47,10 +69,21 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+        <motion.div variants={fadeInUp} className="flex flex-wrap gap-2">
+          {modes.map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => {
+                setActiveMode(mode.id);
+                setMessages(prev => [...prev, { role: 'bot', text: `Switched to ${mode.id} Mode. How can I assist you with ${mode.id.toLowerCase()} today?` }]);
+              }}
+              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center border ${
+                activeMode === mode.id
+                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                : 'glass border-white/5 text-gray-500 hover:border-primary/50'
+              }`}
+            >
+              <span className="mr-2">{mode.icon}</span> {mode.id}
             </button>
           ))}
         </motion.div>
@@ -95,7 +128,7 @@ const Chat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask me anything..."
+              placeholder={`Ask about ${activeMode.toLowerCase()}...`}
               className="flex-1 bg-transparent border-none outline-none px-4 py-4 text-sm font-medium placeholder:text-gray-600"
             />
             <button className="hidden md:flex p-2 text-gray-500 hover:text-white transition-colors mr-3"><Mic size={20} strokeWidth={2.5} /></button>

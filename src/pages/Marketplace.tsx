@@ -1,14 +1,35 @@
-import { motion } from 'framer-motion';
-import { Search, ShoppingCart, MapPin, Star, Plus, Tag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ShoppingCart, MapPin, Star, Plus, X, Upload } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { MarketplaceItem } from '../types';
-import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
+import { fadeInUp, staggerContainer, hoverScale, scaleUp } from '../utils/animations';
+import { MARKETPLACE_CATEGORIES, UNIVERSITIES } from '../utils/constants';
+import { postMarketplaceItem } from '../utils/firebaseUtils';
+import { where } from 'firebase/firestore';
 
 const Marketplace = () => {
-  const { data } = useCollection<MarketplaceItem>('marketplace');
+  const [activeCategory, setActiveCategory] = useState('All Items');
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
+
+  // Form State
+  const [newItem, setNewItem] = useState({
+    title: '',
+    price: '',
+    location: UNIVERSITIES[0],
+    category: MARKETPLACE_CATEGORIES[0],
+    description: ''
+  });
+
+  const constraints = activeCategory === 'All Items'
+    ? [where('status', '==', 'approved')]
+    : [where('status', '==', 'approved'), where('category', '==', activeCategory)];
+
+  const { data: items, loading } = useCollection<MarketplaceItem>('marketplace', constraints);
 
   const mockItems: MarketplaceItem[] = [
     { id: '1', title: "MacBook Pro M1 2020", price: "K15,000", location: "UNZA", rating: 4.8, category: "Electronics", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80", sellerId: 'user1' },
@@ -17,7 +38,25 @@ const Marketplace = () => {
     { id: '4', title: "Scientific Calculator CASIO", price: "K350", location: "UNZA", rating: 4.9, category: "Electronics", image: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=800&q=80", sellerId: 'user4' },
   ];
 
-  const items = data.length > 0 ? data : mockItems;
+  const displayItems = items.length > 0 ? items : (activeCategory === 'All Items' ? mockItems : mockItems.filter(i => i.category === activeCategory));
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploadLoading(true);
+    try {
+      await postMarketplaceItem({
+        ...newItem,
+        rating: 5.0,
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80' // Placeholder
+      });
+      setShowUploadModal(false);
+      setNewItem({ title: '', price: '', location: UNIVERSITIES[0], category: MARKETPLACE_CATEGORIES[0], description: '' });
+    } catch (error) {
+      console.error("Error uploading item:", error);
+    } finally {
+      setUploadLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -43,8 +82,12 @@ const Marketplace = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-12 overflow-x-auto pb-4 no-scrollbar">
-        {['All Items', 'Electronics', 'Books', 'Furniture', 'Fashion', 'Services'].map((cat, i) => (
-          <button key={i} className={`px-8 py-3 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:border-primary/40 hover:text-white'}`}>
+        {['All Items', ...MARKETPLACE_CATEGORIES].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`px-8 py-3 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${activeCategory === cat ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:border-primary/40 hover:text-white'}`}
+          >
             {cat}
           </button>
         ))}
@@ -54,7 +97,7 @@ const Marketplace = () => {
         variants={staggerContainer}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
       >
-        {items.map((item, i) => (
+        {displayItems.map((item) => (
           <motion.div
             key={item.id}
             variants={fadeInUp}
@@ -94,10 +137,110 @@ const Marketplace = () => {
 
       <motion.button
         {...hoverScale}
+        onClick={() => setShowUploadModal(true)}
         className="fixed bottom-10 right-10 w-16 h-16 bg-accent rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-accent/40 z-40 text-white"
       >
         <Plus size={32} strokeWidth={3} />
       </motion.button>
+
+      {/* Upload Modal */}
+      <AnimatePresence>
+        {showUploadModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center px-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowUploadModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-xl glass border border-white/10 rounded-[2.5rem] p-10 relative z-10"
+            >
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="absolute top-8 right-8 text-gray-500 hover:text-white"
+              >
+                <X size={24} strokeWidth={2.5} />
+              </button>
+
+              <h2 className="text-3xl font-black mb-2 tracking-tight">Upload <span className="text-primary">Product</span></h2>
+              <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-10">Reach thousands of students instantly</p>
+
+              <form onSubmit={handleUpload} className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <Input
+                    label="Product Title"
+                    placeholder="e.g. MacBook Pro"
+                    value={newItem.title}
+                    onChange={(e) => setNewItem({...newItem, title: e.target.value})}
+                    required
+                  />
+                  <Input
+                    label="Price (ZMW)"
+                    placeholder="e.g. K500"
+                    value={newItem.price}
+                    onChange={(e) => setNewItem({...newItem, price: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 px-1">Category</label>
+                    <select
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 outline-none focus:border-primary transition-all text-sm font-medium appearance-none"
+                      value={newItem.category}
+                      onChange={(e) => setNewItem({...newItem, category: e.target.value})}
+                    >
+                      {MARKETPLACE_CATEGORIES.map(c => <option key={c} value={c} className="bg-[#0A0B14]">{c}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 px-1">Location</label>
+                    <select
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 outline-none focus:border-primary transition-all text-sm font-medium appearance-none"
+                      value={newItem.location}
+                      onChange={(e) => setNewItem({...newItem, location: e.target.value})}
+                    >
+                      {UNIVERSITIES.map(u => <option key={u} value={u} className="bg-[#0A0B14]">{u}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 px-1">Description</label>
+                   <textarea
+                     className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 outline-none focus:border-primary transition-all text-sm font-medium h-32"
+                     placeholder="Tell us more about the item..."
+                     value={newItem.description}
+                     onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                   />
+                </div>
+
+                <div className="border-2 border-dashed border-white/10 rounded-3xl p-8 text-center hover:border-primary/40 transition-all cursor-pointer group">
+                   <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-500 group-hover:text-primary group-hover:bg-primary/10 transition-all">
+                      <Upload size={20} strokeWidth={2.5} />
+                   </div>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">Click to upload product images</p>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full py-5 text-[10px] font-black uppercase tracking-[0.2em]"
+                  isLoading={uploadLoading}
+                >
+                  Post for Approval
+                </Button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
