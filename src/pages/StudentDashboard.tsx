@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import {
   LayoutDashboard, User, Home, ShoppingBag,
   Briefcase, Calendar, MessageSquare, Cpu,
-  Settings, Bell, Search, MapPin, CheckCircle
+  Settings, Bell, Search, MapPin, CheckCircle, Award
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -65,12 +65,18 @@ const StudentDashboard = () => {
             </div>
 
             <div className="flex-1 text-center md:text-left z-10">
-              <h2 className="text-3xl font-extrabold flex items-center justify-center md:justify-start tracking-tight">
-                {profile?.displayName || 'Chanda Musonda'}
-                <div className="ml-3 p-1 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
-                  <CheckCircle size={12} strokeWidth={4} className="text-white" />
+              <div className="flex flex-col md:flex-row md:items-center justify-center md:justify-start space-y-2 md:space-y-0 md:space-x-4">
+                <h2 className="text-3xl font-extrabold flex items-center tracking-tight">
+                  {profile?.displayName || 'Chanda Musonda'}
+                  <div className="ml-3 p-1 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
+                    <CheckCircle size={12} strokeWidth={4} className="text-white" />
+                  </div>
+                </h2>
+                <div className="flex items-center space-x-1 bg-accent/20 text-accent px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border border-accent/20">
+                  <Award size={10} strokeWidth={3} />
+                  <span>Verified</span>
                 </div>
-              </h2>
+              </div>
               <p className="text-primary font-bold text-sm mt-2 uppercase tracking-widest">{profile?.university || 'University of Zambia (UNZA)'}</p>
               <p className="text-gray-400 text-xs mt-1 font-medium italic opacity-80">{profile?.course || 'Bachelor of Computer Science'}</p>
 
