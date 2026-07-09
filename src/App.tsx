@@ -35,7 +35,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <div className="min-h-screen bg-[#0A0B14] text-white selection:bg-primary/30 overflow-x-hidden font-sans text-xs">
+        <div className="min-h-screen bg-white dark:bg-[#0A0B14] text-[#0A0B14] dark:text-white transition-colors duration-300 selection:bg-primary/30 overflow-x-hidden font-sans text-xs">
           <Navbar />
           <div className="pt-20">
             <AnimatePresence mode="wait">

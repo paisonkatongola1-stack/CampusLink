@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import { fadeInUp, scaleUp } from '../utils/animations';
 
 const Chat = () => {
+  const [mode, setMode] = useState<'Study' | 'Career' | 'Housing' | 'Marketplace'>('Study');
   const [messages, setMessages] = useState([
-    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I can help you summarize study notes, review your CV, or find the best accommodation deals. What's on your mind?" }
+    { role: 'bot', text: "Hello! I'm your CampusLink AI Assistant. I'm currently in Study mode. I can help you summarize notes, explain complex concepts, or generate practice questions. How can I assist your learning today?" }
   ]);
   const [input, setInput] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -23,11 +24,41 @@ const Chat = () => {
     setInput("");
 
     setTimeout(() => {
+      let response = "";
+      switch (mode) {
+        case 'Study':
+          response = "I've analyzed your notes. The key concepts here involve the socioeconomic impact of copper mining in Zambia. Would you like me to generate some quiz questions on this topic?";
+          break;
+        case 'Career':
+          response = "Based on your CV, I recommend highlighting your recent project with React. Employers in the Zambian tech hub like Zambia Tech Hub are currently looking for strong frontend skills.";
+          break;
+        case 'Housing':
+          response = "I've scanned listings near UNZA. There's a new 'Self-contained' room in Silverest at K3,200 which fits your criteria perfectly. Would you like to contact the landlord?";
+          break;
+        case 'Marketplace':
+          response = "A fair price for a 2020 MacBook Pro M1 in Lusaka ranges between K14,000 and K16,500 depending on the battery cycle count. I suggest listing it at K15,500 to attract serious buyers.";
+          break;
+        default:
+          response = "I've analyzed your request. Based on current trends in Zambia, here is what I recommend... (This is a simulated AI response tailored to your needs).";
+      }
+
       setMessages(prev => [...prev, {
         role: 'bot',
-        text: "I've analyzed your request. Based on current trends at UNZA and my internal database, here is what I recommend... (This is a simulated AI response tailored to student needs in Zambia)."
+        text: response
       }]);
     }, 1200);
+  };
+
+  const changeMode = (newMode: 'Study' | 'Career' | 'Housing' | 'Marketplace') => {
+    setMode(newMode);
+    let intro = "";
+    switch (newMode) {
+      case 'Study': intro = "Switched to Study mode. Send me your notes or ask a question about your course!"; break;
+      case 'Career': intro = "Career mode active. Upload your CV for review or ask for interview tips!"; break;
+      case 'Housing': intro = "Housing mode active. Tell me your budget and preferred university area!"; break;
+      case 'Marketplace': intro = "Marketplace mode active. Ask me about fair pricing for items or how to optimize your listing!"; break;
+    }
+    setMessages(prev => [...prev, { role: 'bot', text: intro }]);
   };
 
   return (
@@ -47,10 +78,16 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
-              <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
+        <motion.div variants={fadeInUp} className="flex space-x-2 overflow-x-auto pb-2 no-scrollbar">
+          {['Study', 'Career', 'Housing', 'Marketplace'].map((m) => (
+            <button
+              key={m}
+              onClick={() => changeMode(m)}
+              className={`px-4 py-2 glass border rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center whitespace-nowrap ${
+                mode === m ? 'border-primary text-primary bg-primary/5' : 'border-white/5 hover:border-primary/50'
+              }`}
+            >
+              <Sparkles size={12} strokeWidth={2.5} className={`mr-2 ${mode === m ? 'text-primary' : 'text-gray-500'}`} /> {m}
             </button>
           ))}
         </motion.div>
