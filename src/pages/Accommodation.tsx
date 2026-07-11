@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Navigation } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { AccommodationListing } from '../types';
 import { fadeInUp, staggerContainer } from '../utils/animations';
+import { UNIVERSITIES } from '../utils/constants';
 
 const Accommodation = () => {
   const { data } = useCollection<AccommodationListing>('accommodation');
@@ -68,17 +69,35 @@ const Accommodation = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
-        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter, i) => (
+        {['All', 'Under K3,000', ...UNIVERSITIES.map(u => u.split(' (')[0]), 'Self-contained'].map((filter, i) => (
           <button key={i} className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}>
             {filter}
           </button>
         ))}
       </motion.div>
 
-      <motion.div
-        variants={staggerContainer}
-        className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
-      >
+      <div className="grid lg:grid-cols-4 gap-10 mb-20">
+        <motion.div variants={fadeInUp} className="lg:col-span-1">
+           <Card className="p-8 h-full glass-morphism border-primary/20 relative overflow-hidden" hoverable={false}>
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
+              <div className="flex items-center space-x-3 mb-6">
+                 <div className="p-2.5 bg-primary text-white rounded-xl shadow-lg shadow-primary/20">
+                    <Navigation size={18} strokeWidth={2.5} />
+                 </div>
+                 <h3 className="font-black text-sm uppercase tracking-widest">Map View</h3>
+              </div>
+              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-8 leading-relaxed">Interactive campus map coming soon. View listings by distance and proximity to UNZA & CBU.</p>
+              <div className="aspect-square bg-white/5 rounded-[2rem] border border-white/10 flex items-center justify-center relative group cursor-pointer overflow-hidden">
+                 <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/28.31,15.42,12,0/400x400?access_token=pk.placeholder')] opacity-20 group-hover:opacity-40 transition-opacity grayscale" />
+                 <Button variant="glass" size="sm" className="relative z-10 text-[9px] font-black uppercase tracking-widest border-white/20">Open Map</Button>
+              </div>
+           </Card>
+        </motion.div>
+
+        <motion.div
+          variants={staggerContainer}
+          className="lg:col-span-3 grid md:grid-cols-2 gap-10"
+        >
         {listings.map((item, i) => (
           <motion.div
             key={item.id}
@@ -111,7 +130,8 @@ const Accommodation = () => {
             </Card>
           </motion.div>
         ))}
-      </motion.div>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };

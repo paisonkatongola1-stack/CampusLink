@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
 import { createUserProfile } from '../utils/firebaseUtils';
+import { ROLES } from '../utils/constants';
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -18,12 +19,13 @@ export default function Signup() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const roles = [
-        { id: 'student', title: 'Student', icon: <GraduationCap size={24} strokeWidth={2.5} />, desc: 'Find housing & jobs' },
-        { id: 'business', title: 'Business', icon: <Briefcase size={24} strokeWidth={2.5} />, desc: 'Sell to students' },
-        { id: 'landlord', title: 'Landlord', icon: <Home size={24} strokeWidth={2.5} />, desc: 'List your property' },
-        { id: 'employer', title: 'Employer', icon: <ShieldCheck size={24} strokeWidth={2.5} />, desc: 'Hire top talent' },
-    ] as const;
+    const rolesWithIcons = ROLES.filter(r => r.id !== 'admin').map(r => ({
+        ...r,
+        icon: r.id === 'student' ? <GraduationCap size={24} strokeWidth={2.5} /> :
+              r.id === 'business' ? <Briefcase size={24} strokeWidth={2.5} /> :
+              r.id === 'landlord' ? <Home size={24} strokeWidth={2.5} /> :
+              <ShieldCheck size={24} strokeWidth={2.5} />
+    }));
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -67,7 +69,7 @@ export default function Signup() {
                         <div className="space-y-4">
                             <label className="text-sm font-medium text-gray-400">I want to join as a:</label>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {roles.map((r) => (
+                                {rolesWithIcons.map((r) => (
                                     <button
                                         key={r.id}
                                         type="button"

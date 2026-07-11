@@ -6,6 +6,7 @@ import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
 import { fadeInUp, staggerContainer } from '../utils/animations';
+import { JOB_TYPES } from '../utils/constants';
 
 const Jobs = () => {
   const { data } = useCollection<JobListing>('jobs');
@@ -51,9 +52,9 @@ const Jobs = () => {
          <div className="flex-1">
             <Input placeholder="Search roles or companies..." icon={<Search size={20} strokeWidth={2.5} />} className="shadow-2xl" />
          </div>
-         <div className="flex space-x-2">
-           {['Internship', 'Part-time', 'Remote'].map(f => (
-             <Button key={f} variant="glass" size="sm" className="text-[10px] font-black uppercase tracking-[0.2em] border-white/5">{f}</Button>
+         <div className="flex space-x-2 overflow-x-auto pb-2 no-scrollbar">
+           {JOB_TYPES.map(f => (
+             <Button key={f} variant="glass" size="sm" className="text-[10px] font-black uppercase tracking-[0.2em] border-white/5 whitespace-nowrap">{f}</Button>
            ))}
          </div>
       </motion.div>

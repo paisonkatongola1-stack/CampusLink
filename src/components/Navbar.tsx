@@ -1,12 +1,13 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles, Moon, Sun } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -25,6 +26,29 @@ const Navbar = () => {
     }
   };
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      setIsDark(false);
+      document.documentElement.classList.remove('dark');
+    } else {
+      setIsDark(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    if (newDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Accommodation', path: '/accommodation' },
@@ -35,9 +59,9 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-4 shadow-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 dark:border-white/5 px-6 py-4 shadow-2xl transition-colors duration-300">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-black text-white tracking-tighter italic flex items-center">
+        <Link to="/" className="text-2xl font-black text-surface dark:text-white tracking-tighter italic flex items-center">
           Campus<span className="text-primary italic-none ml-0.5">Link</span>
         </Link>
 
@@ -47,22 +71,26 @@ const Navbar = () => {
             <NavLink
               key={link.name}
               to={link.path}
-              className={({ isActive }) => `text-[10px] uppercase tracking-[0.2em] transition-all ${isActive ? 'text-primary' : 'text-gray-400 hover:text-white'}`}
+              className={({ isActive }) => `text-[10px] uppercase tracking-[0.2em] transition-all ${isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400 dark:hover:text-white hover:text-surface'}`}
             >
               {link.name}
             </NavLink>
           ))}
 
-          <div className="h-4 w-px bg-white/10 mx-2" />
+          <div className="h-4 w-px bg-black/10 dark:bg-white/10 mx-2" />
+
+          <button onClick={toggleTheme} className="p-2 text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">
+            {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+          </button>
 
           {user ? (
             <div className="flex items-center space-x-4">
-              <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
+              <Link to="/chat" className="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">
                 <Sparkles size={18} strokeWidth={2.5} />
               </Link>
-              <Link to={getDashboardLink()} className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.2em] bg-white/5 border border-white/10 px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
+              <Link to={getDashboardLink()} className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.2em] bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-4 py-2 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-all">
                 <LayoutDashboard size={14} strokeWidth={2.5} />
-                <span>Panel</span>
+                <span className="text-surface dark:text-white">Panel</span>
               </Link>
               <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 transition-colors p-2">
                 <LogOut size={18} strokeWidth={2.5} />
@@ -79,8 +107,11 @@ const Navbar = () => {
         </div>
 
         {/* Mobile menu button */}
-        <div className="lg:hidden flex items-center">
-          <button onClick={() => setIsOpen(!isOpen)} className="text-white p-2">
+        <div className="lg:hidden flex items-center space-x-4">
+          <button onClick={toggleTheme} className="p-2 text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">
+            {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+          </button>
+          <button onClick={() => setIsOpen(!isOpen)} className="text-surface dark:text-white p-2">
             {isOpen ? <X size={24} strokeWidth={2.5} /> : <Menu size={24} strokeWidth={2.5} />}
           </button>
         </div>
