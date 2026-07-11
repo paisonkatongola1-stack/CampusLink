@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-secondary text-white font-sans antialiased;
+    @apply bg-white dark:bg-secondary text-surface dark:text-white font-sans antialiased transition-colors duration-300;
   }
 }
 

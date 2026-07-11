@@ -47,9 +47,27 @@ const Chat = () => {
           <motion.p variants={fadeInUp} className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Your personal study and career partner</motion.p>
         </div>
 
-        <motion.div variants={fadeInUp} className="flex space-x-2">
-          {['Study', 'Career', 'Housing'].map((mode) => (
-            <button key={mode} className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center">
+        <motion.div variants={fadeInUp} className="flex flex-wrap gap-2">
+          {['Study', 'Career', 'Housing', 'Marketplace'].map((mode) => (
+            <button
+              key={mode}
+              onClick={() => {
+                setInput(`I need help with ${mode.toLowerCase()}...`);
+                setMessages(prev => [...prev, { role: 'user', text: `Tell me about your ${mode} Assistant features.` }]);
+                setTimeout(() => {
+                  setMessages(prev => [...prev, {
+                    role: 'bot',
+                    text: `My ${mode} Assistant mode is now active! I can help you with specific tasks like ${
+                      mode === 'Study' ? 'summarizing notes and generating quiz questions' :
+                      mode === 'Career' ? 'reviewing your CV and preparing for interviews' :
+                      mode === 'Housing' ? 'finding the best rooms near your campus' :
+                      'suggesting fair prices for items and managing listings'
+                    }. How can I assist you today?`
+                  }]);
+                }, 1000);
+              }}
+              className="px-4 py-2 glass border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary/50 transition-all flex items-center"
+            >
               <Sparkles size={12} strokeWidth={2.5} className="mr-2 text-primary" /> {mode}
             </button>
           ))}
