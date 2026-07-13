@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle } from 'lucide-react';
+import { User, Mail, GraduationCap, MapPin, Edit3, Camera, CheckCircle, FileText, Upload } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
@@ -70,6 +70,16 @@ const Profile = () => {
                 {['React', 'TypeScript', 'Node.js', 'Python', 'UI/UX'].map(s => (
                   <span key={s} className="px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20 hover:bg-primary hover:text-white transition-all cursor-default">{s}</span>
                 ))}
+              </div>
+           </Card>
+
+           <Card className="p-8 border-primary/20 bg-primary/5" hoverable={false}>
+              <h3 className="font-black text-[10px] uppercase tracking-[0.2em] text-primary mb-6 flex items-center">
+                 <FileText size={14} className="mr-2" /> My Documents
+              </h3>
+              <div className="p-5 border-2 border-dashed border-primary/20 rounded-2xl flex flex-col items-center text-center group hover:bg-primary/5 transition-all cursor-pointer">
+                 <Upload size={24} className="text-primary/40 mb-3 group-hover:scale-110 transition-transform" />
+                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Upload CV/Resume</p>
               </div>
            </Card>
         </motion.div>
