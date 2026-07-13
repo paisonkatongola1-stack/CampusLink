@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Heart, Navigation } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -9,6 +10,13 @@ import { fadeInUp, staggerContainer } from '../utils/animations';
 
 const Accommodation = () => {
   const { data } = useCollection<AccommodationListing>('accommodation');
+  const [savedListings, setSavedListings] = useState<string[]>([]);
+
+  const toggleSave = (id: string) => {
+    setSavedListings(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
 
   const mockListings: AccommodationListing[] = [
     {
@@ -75,10 +83,11 @@ const Accommodation = () => {
         ))}
       </motion.div>
 
-      <motion.div
-        variants={staggerContainer}
-        className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
-      >
+      <div className="grid lg:grid-cols-4 gap-10">
+        <motion.div
+          variants={staggerContainer}
+          className="lg:col-span-3 grid md:grid-cols-2 gap-10"
+        >
         {listings.map((item, i) => (
           <motion.div
             key={item.id}
@@ -91,6 +100,12 @@ const Accommodation = () => {
                 <div className="absolute top-6 right-6 bg-primary/90 backdrop-blur-xl text-white font-black px-4 py-2 rounded-xl text-sm shadow-2xl border border-white/10">
                   {item.price}<span className="text-[10px] font-normal text-white/70">/mo</span>
                 </div>
+                <button
+                  onClick={(e) => { e.preventDefault(); toggleSave(item.id); }}
+                  className={`absolute top-6 left-6 p-2.5 rounded-xl backdrop-blur-xl border border-white/10 transition-all ${savedListings.includes(item.id) ? 'bg-accent text-white' : 'bg-black/40 text-white hover:bg-white/20'}`}
+                >
+                  <Heart size={18} strokeWidth={2.5} className={savedListings.includes(item.id) ? 'fill-current' : ''} />
+                </button>
               </div>
               <div className="p-8">
                 <div className="flex justify-between items-start mb-3">
@@ -111,7 +126,38 @@ const Accommodation = () => {
             </Card>
           </motion.div>
         ))}
-      </motion.div>
+        </motion.div>
+
+        {/* Map Placeholder */}
+        <motion.div variants={fadeInUp} className="hidden lg:block lg:col-span-1">
+           <div className="sticky top-28">
+              <Card className="p-0 overflow-hidden h-[600px] relative border-white/5 bg-[#0F111A]" hoverable={false}>
+                 <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/28.28, -15.42,10/400x600?access_token=pk.xxx')] bg-cover bg-center opacity-40" />
+                 <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-black/80" />
+
+                 <div className="relative z-10 h-full flex flex-col items-center justify-center p-10 text-center">
+                    <div className="w-20 h-20 bg-primary/20 rounded-[2rem] flex items-center justify-center text-primary mb-6 shadow-2xl border border-primary/20 animate-pulse">
+                       <Navigation size={32} strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-xl font-bold mb-4 tracking-tight">Interactive Map</h3>
+                    <p className="text-gray-400 text-xs font-medium leading-relaxed mb-8">View all listings and their proximity to {mockListings[0].university} on an interactive map.</p>
+                    <Button variant="glass" className="w-full border-white/10">
+                       Enable Location
+                    </Button>
+                 </div>
+
+                 {/* Decorative Map Pins */}
+                 {[
+                   { t: '20%', l: '30%' },
+                   { t: '45%', l: '65%' },
+                   { t: '70%', l: '40%' },
+                 ].map((pos, i) => (
+                   <div key={i} className="absolute w-4 h-4 bg-primary rounded-full border-2 border-white shadow-[0_0_15px_rgba(46,91,255,1)] animate-bounce" style={{ top: pos.t, left: pos.l, animationDelay: `${i * 0.5}s` }} />
+                 ))}
+              </Card>
+           </div>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };

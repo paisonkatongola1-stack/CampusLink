@@ -1,14 +1,37 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles, Moon, Sun } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      setIsDark(false);
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    if (newDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -32,6 +55,7 @@ const Navbar = () => {
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },
     { name: 'Services', path: '/businesses' },
+    { name: 'AI Assistant', path: '/chat' },
   ];
 
   return (
@@ -55,11 +79,12 @@ const Navbar = () => {
 
           <div className="h-4 w-px bg-white/10 mx-2" />
 
+          <button onClick={toggleTheme} className="p-2 text-gray-400 hover:text-primary transition-colors">
+            {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+          </button>
+
           {user ? (
             <div className="flex items-center space-x-4">
-              <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
-                <Sparkles size={18} strokeWidth={2.5} />
-              </Link>
               <Link to={getDashboardLink()} className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.2em] bg-white/5 border border-white/10 px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
                 <LayoutDashboard size={14} strokeWidth={2.5} />
                 <span>Panel</span>
