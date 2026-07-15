@@ -1,12 +1,19 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles, Sun, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    return true;
+  });
+
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,6 +21,18 @@ const Navbar = () => {
     await logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
+
+  const toggleTheme = () => setIsDark(!isDark);
 
   const getDashboardLink = () => {
     if (!profile) return '/dashboard';
@@ -57,6 +76,9 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center space-x-4">
+              <button onClick={toggleTheme} className="text-gray-400 hover:text-primary transition-colors p-2">
+                {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+              </button>
               <Link to="/chat" className="text-gray-400 hover:text-primary transition-colors">
                 <Sparkles size={18} strokeWidth={2.5} />
               </Link>
@@ -70,6 +92,9 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
+              <button onClick={toggleTheme} className="text-gray-400 hover:text-primary transition-colors p-2">
+                {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+              </button>
               <Link to="/login" className="text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors px-4 py-2">Login</Link>
               <Link to="/signup">
                 <Button size="sm" className="px-6 py-2.5 text-[10px] uppercase tracking-[0.2em]">Join Now</Button>

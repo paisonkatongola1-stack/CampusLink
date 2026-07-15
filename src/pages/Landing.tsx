@@ -1,7 +1,27 @@
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform, animate, useMotionValueEvent } from 'framer-motion';
 import { ArrowRight, Sparkles, Building2, ShoppingBag, Briefcase, Calendar, Cpu } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { fadeInUp, staggerContainer, float, hoverScale } from '../utils/animations';
+
+const Counter = ({ value, duration = 2 }: { value: string, duration?: number }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+  const [displayValue, setDisplayValue] = useState(0);
+  const numericValue = parseInt(value.replace(/\D/g, ''));
+  const suffix = value.replace(/[0-9]/g, '');
+
+  useMotionValueEvent(rounded, "change", (latest) => {
+    setDisplayValue(latest);
+  });
+
+  useEffect(() => {
+    const controls = animate(count, numericValue, { duration });
+    return controls.stop;
+  }, [numericValue, duration, count]);
+
+  return <span>{displayValue}{suffix}</span>;
+};
 
 const Landing = () => {
   const features = [
@@ -107,7 +127,7 @@ const Landing = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="w-full bg-[#05060B] py-24 px-6 border-y border-white/5">
+      <section className="w-full bg-[#05060B] dark:bg-black py-24 px-6 border-y border-white/5">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-12 text-center">
           {[
             { label: "Verified Students", value: "5000+" },
@@ -123,7 +143,9 @@ const Landing = () => {
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-4xl font-black text-white mb-2 tracking-tighter">{stat.value}</h3>
+              <h3 className="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tighter">
+                <Counter value={stat.value} />
+              </h3>
               <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">{stat.label}</p>
             </motion.div>
           ))}
@@ -180,7 +202,7 @@ const Landing = () => {
       <footer className="w-full border-t border-white/5 py-16 px-6 bg-[#05060B]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="text-2xl font-black mb-6 md:mb-0 tracking-tighter italic">
-            Campus<span className="text-primary italic-none">Link</span>
+            Campus<span className="text-primary not-italic">Link</span>
           </div>
           <div className="text-gray-500 text-xs font-bold uppercase tracking-widest">
             © 2026 CampusLink Zambia • Built for the next generation

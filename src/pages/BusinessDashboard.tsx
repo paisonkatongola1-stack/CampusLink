@@ -2,20 +2,46 @@ import { motion } from 'framer-motion';
 import {
   LayoutDashboard, User, Briefcase, ShoppingBag,
   MessageSquare, Settings, Bell, Search, Eye,
-  MessageCircle, Zap, Clock, Plus, TrendingUp
+  MessageCircle, Zap, Clock, Plus, TrendingUp,
+  Home, Users, Calendar
 } from 'lucide-react';
 import { fadeInUp, staggerContainer, hoverScale } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Sidebar } from '../components/ui/Sidebar';
+import { useAuth } from '../context/AuthContext';
 
 const BusinessDashboard = () => {
-  const stats = [
-    { label: "Total Views", value: "12.4k", icon: <Eye size={22} strokeWidth={2.5} className="text-blue-500" />, trend: "+12%" },
-    { label: "Inquiries", value: "48", icon: <MessageCircle size={22} strokeWidth={2.5} className="text-green-500" />, trend: "+5%" },
-    { label: "Active Jobs", value: "5", icon: <Briefcase size={22} strokeWidth={2.5} className="text-primary" />, trend: "0%" },
-    { label: "Pending Orders", value: "12", icon: <Clock size={22} strokeWidth={2.5} className="text-accent" />, trend: "+2" },
-  ];
+  const { profile } = useAuth();
+  const role = profile?.role || 'business';
+
+  const getStats = () => {
+    switch (role) {
+      case 'landlord':
+        return [
+          { label: "Property Views", value: "3.2k", icon: <Eye size={22} strokeWidth={2.5} className="text-blue-500" />, trend: "+8%" },
+          { label: "Viewing Requests", value: "24", icon: <Calendar size={22} strokeWidth={2.5} className="text-green-500" />, trend: "+12%" },
+          { label: "Listed Rooms", value: "8", icon: <Home size={22} strokeWidth={2.5} className="text-primary" />, trend: "0%" },
+          { label: "Active Tenants", value: "15", icon: <Users size={22} strokeWidth={2.5} className="text-accent" />, trend: "+1" },
+        ];
+      case 'employer':
+        return [
+          { label: "Job Views", value: "8.5k", icon: <Eye size={22} strokeWidth={2.5} className="text-blue-500" />, trend: "+15%" },
+          { label: "Total Applicants", value: "156", icon: <Users size={22} strokeWidth={2.5} className="text-green-500" />, trend: "+20%" },
+          { label: "Active Postings", value: "12", icon: <Briefcase size={22} strokeWidth={2.5} className="text-primary" />, trend: "+2" },
+          { label: "Interviews", value: "18", icon: <Calendar size={22} strokeWidth={2.5} className="text-accent" />, trend: "+4" },
+        ];
+      default:
+        return [
+          { label: "Total Views", value: "12.4k", icon: <Eye size={22} strokeWidth={2.5} className="text-blue-500" />, trend: "+12%" },
+          { label: "Inquiries", value: "48", icon: <MessageCircle size={22} strokeWidth={2.5} className="text-green-500" />, trend: "+5%" },
+          { label: "Active Jobs", value: "5", icon: <Briefcase size={22} strokeWidth={2.5} className="text-primary" />, trend: "0%" },
+          { label: "Pending Orders", value: "12", icon: <Clock size={22} strokeWidth={2.5} className="text-accent" />, trend: "+2" },
+        ];
+    }
+  };
+
+  const stats = getStats();
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} strokeWidth={2.5} />, label: "Dashboard", href: "/business-dashboard" },
@@ -38,11 +64,14 @@ const BusinessDashboard = () => {
       <main className="flex-1 p-6 lg:p-10">
         <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
           <motion.div variants={fadeInUp}>
-            <h1 className="text-3xl font-black tracking-tight uppercase italic">Business <span className="text-primary italic-none">Hub</span></h1>
+            <h1 className="text-3xl font-black tracking-tight uppercase italic">
+              {role === 'landlord' ? 'Landlord' : role === 'employer' ? 'Employer' : 'Business'} <span className="text-primary not-italic">Hub</span>
+            </h1>
             <p className="text-gray-500 font-black uppercase tracking-[0.2em] text-[10px]">Manage your ecosystem presence</p>
           </motion.div>
           <motion.button {...hoverScale} className="flex items-center px-8 py-4 bg-primary rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
-            <Plus size={18} strokeWidth={3} className="mr-2" /> Post New
+            <Plus size={18} strokeWidth={3} className="mr-2" />
+            {role === 'landlord' ? 'Add Property' : role === 'employer' ? 'Post Job' : 'Post New'}
           </motion.button>
         </header>
 
@@ -66,13 +95,19 @@ const BusinessDashboard = () => {
 
         <div className="grid lg:grid-cols-3 gap-10">
            <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-6">
-              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 ml-2">Recent Applications</h3>
+              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 ml-2">
+                {role === 'landlord' ? 'Recent Viewing Requests' : role === 'employer' ? 'Recent Applicants' : 'Recent Inquiries'}
+              </h3>
               <div className="space-y-4">
-                {[
+                {(role === 'landlord' ? [
+                  { name: "Mwaka Mutale", role: "Riverside Shared Room", status: "New", date: "2h ago", color: "blue" },
+                  { name: "Banda Chileshe", role: "Silverest Executive", status: "Viewing Set", date: "5h ago", color: "yellow" },
+                  { name: "Kunda Musonda", role: "Riverside Shared Room", status: "Approved", date: "Yesterday", color: "green" },
+                ] : [
                   { name: "Mwaka Mutale", role: "Software Intern", status: "New", date: "2h ago", color: "blue" },
                   { name: "Banda Chileshe", role: "Marketing Assistant", status: "Reviewing", date: "5h ago", color: "yellow" },
                   { name: "Kunda Musonda", role: "Software Intern", status: "Shortlisted", date: "Yesterday", color: "green" },
-                ].map((app, i) => (
+                ]).map((app, i) => (
                   <motion.div key={i} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
                     <Card className="flex items-center justify-between p-6 bg-white/2 hover:bg-white/5 border-white/5 transition-all">
                       <div className="flex items-center space-x-5">
@@ -87,7 +122,7 @@ const BusinessDashboard = () => {
                       <div className="text-right">
                          <span className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest ${
                            app.status === 'New' ? 'bg-blue-500/20 text-blue-500' :
-                           app.status === 'Shortlisted' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
+                           app.status === 'Shortlisted' || app.status === 'Approved' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
                          }`}>{app.status}</span>
                          <div className="text-[9px] font-black text-gray-600 uppercase tracking-widest mt-2">{app.date}</div>
                       </div>
@@ -98,12 +133,20 @@ const BusinessDashboard = () => {
            </motion.div>
 
            <motion.div variants={fadeInUp} className="space-y-6">
-              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 ml-2">Active Listings</h3>
+              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500 ml-2">
+                {role === 'landlord' ? 'Your Properties' : role === 'employer' ? 'Active Jobs' : 'Active Listings'}
+              </h3>
               <div className="space-y-4">
-                 {[
+                 {(role === 'landlord' ? [
+                   { title: "Riverside Shared Room", views: "1.2k", price: "K2,500/mo", color: "text-blue-400" },
+                   { title: "Silverest Executive", views: "3.5k", price: "K4,000/mo", color: "text-green-400" }
+                 ] : role === 'employer' ? [
+                    { title: "Software Dev Intern", views: "2.4k", price: "K4,500/mo", color: "text-blue-400" },
+                    { title: "UX Designer", views: "1.1k", price: "K6,000/mo", color: "text-green-400" }
+                 ] : [
                    { title: "MacBook Pro M1", views: "1.2k", price: "K15,000", color: "text-blue-400" },
                    { title: "Calculus Tutors", views: "850", price: "K150/hr", color: "text-green-400" }
-                 ].map((item, i) => (
+                 ]).map((item, i) => (
                    <Card key={i} className="p-6 bg-white/2 border-white/5 group">
                       <div className="font-bold text-sm mb-3 tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
                       <div className="flex justify-between items-center">
@@ -115,7 +158,7 @@ const BusinessDashboard = () => {
                    </Card>
                  ))}
                  <button className="w-full py-6 border-2 border-dashed border-white/5 rounded-3xl text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] hover:border-primary/40 hover:text-primary transition-all">
-                   + Create New Listing
+                   + {role === 'landlord' ? 'Add Property' : role === 'employer' ? 'Post New Job' : 'Create New Listing'}
                  </button>
               </div>
            </motion.div>
