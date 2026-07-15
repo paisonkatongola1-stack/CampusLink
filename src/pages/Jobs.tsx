@@ -1,13 +1,22 @@
-import { motion } from 'framer-motion';
-import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Briefcase, MapPin, DollarSign, Clock, CheckCircle, ArrowUpRight, Upload, X, FileText } from 'lucide-react';
+import { useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useCollection } from '../hooks/useData';
 import { JobListing } from '../types';
-import { fadeInUp, staggerContainer } from '../utils/animations';
+import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
+import { applyForJob, uploadFile } from '../utils/firebaseUtils';
+import { useAuth } from '../context/AuthContext';
 
 const Jobs = () => {
+  const { user } = useAuth();
+  const [applyingJob, setApplyingJob] = useState<JobListing | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [applySuccess, setApplySuccess] = useState(false);
+
   const { data } = useCollection<JobListing>('jobs');
 
   const mockJobs: JobListing[] = [
@@ -59,7 +68,7 @@ const Jobs = () => {
       </motion.div>
 
       <motion.div variants={staggerContainer} className="space-y-6">
-        {jobs.map((job, i) => (
+        {jobs.map((job) => (
           <motion.div key={job.id} variants={fadeInUp} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
             <Card className="p-8 flex flex-col md:flex-row md:items-center justify-between space-y-8 md:space-y-0">
               <div className="flex items-center space-x-8">
@@ -77,7 +86,11 @@ const Jobs = () => {
                  </div>
               </div>
               <div className="flex items-center space-x-4">
-                <Button className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]" size="lg">
+                <Button
+                  onClick={() => setApplyingJob(job)}
+                  className="flex-1 md:flex-none px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em]"
+                  size="lg"
+                >
                   Apply Now
                 </Button>
                 <Button variant="glass" className="p-4 border-white/5">
@@ -88,6 +101,117 @@ const Jobs = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      {/* Application Modal */}
+      <AnimatePresence>
+        {applyingJob && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isUploading && setApplyingJob(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              variants={scaleUp}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="w-full max-w-lg relative z-10"
+            >
+              <Card className="p-10 shadow-2xl border-white/10" hoverable={false}>
+                {!applySuccess ? (
+                  <>
+                    <div className="flex justify-between items-start mb-8">
+                      <div>
+                        <h2 className="text-3xl font-black tracking-tight mb-2">Apply for Role</h2>
+                        <p className="text-primary font-bold text-[10px] uppercase tracking-[0.2em]">{applyingJob.role} @ {applyingJob.company}</p>
+                      </div>
+                      <button
+                        onClick={() => setApplyingJob(null)}
+                        className="p-2 text-gray-500 hover:text-white transition-colors"
+                      >
+                        <X size={24} strokeWidth={2.5} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-8">
+                      <div className="p-10 border-2 border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center text-center group hover:border-primary/50 transition-all bg-white/2 relative">
+                        {cvFile ? (
+                          <div className="flex flex-col items-center">
+                            <div className="w-16 h-16 bg-primary/20 text-primary rounded-2xl flex items-center justify-center mb-4">
+                              <FileText size={32} strokeWidth={2.5} />
+                            </div>
+                            <p className="text-sm font-bold text-white mb-1 truncate max-w-[200px]">{cvFile.name}</p>
+                            <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{(cvFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                            <button
+                              onClick={() => setCvFile(null)}
+                              className="mt-4 text-xs font-black text-red-500 uppercase tracking-widest hover:text-red-400 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="w-16 h-16 bg-white/5 text-gray-500 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                              <Upload size={32} strokeWidth={2.5} />
+                            </div>
+                            <h4 className="text-lg font-bold mb-2">Upload your CV</h4>
+                            <p className="text-gray-500 text-xs font-medium mb-6">PDF, DOCX or JPG (Max 5MB)</p>
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                              onChange={(e) => e.target.files?.[0] && setCvFile(e.target.files[0])}
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                            />
+                            <Button variant="glass" size="sm" className="pointer-events-none">Select File</Button>
+                          </>
+                        )}
+                      </div>
+
+                      <Button
+                        onClick={async () => {
+                          if (!cvFile || !user) return;
+                          setIsUploading(true);
+                          try {
+                            const cvUrl = await uploadFile(cvFile, `cvs/${user.uid}/${Date.now()}_${cvFile.name}`);
+                            await applyForJob(applyingJob.id, { cvUrl });
+                            setApplySuccess(true);
+                            setTimeout(() => {
+                              setApplySuccess(false);
+                              setApplyingJob(null);
+                              setCvFile(null);
+                            }, 3000);
+                          } catch (e) {
+                            console.error(e);
+                          } finally {
+                            setIsUploading(false);
+                          }
+                        }}
+                        className="w-full py-5 text-[10px] font-black uppercase tracking-[0.2em]"
+                        size="lg"
+                        isLoading={isUploading}
+                        disabled={!cvFile}
+                      >
+                        Submit Application
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-10">
+                    <div className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-green-500/10">
+                       <CheckCircle size={48} strokeWidth={2.5} />
+                    </div>
+                    <h2 className="text-3xl font-black tracking-tight mb-3">Application Sent!</h2>
+                    <p className="text-gray-400 font-medium text-sm">Your CV has been successfully delivered to {applyingJob.company}. Good luck!</p>
+                  </div>
+                )}
+              </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

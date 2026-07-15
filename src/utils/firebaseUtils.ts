@@ -9,9 +9,13 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
-  Timestamp
+  Timestamp,
+  onSnapshot,
+  orderBy,
+  limit
 } from "firebase/firestore";
 import { auth } from "../firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { UserProfile, AccommodationListing, JobListing, MarketplaceItem } from "../types";
 
 // Note: In a real environment with Data Connect, we would use the generated SDK.
@@ -49,6 +53,41 @@ export const applyForJob = async (jobId: string, applicantData: any) => {
     ...applicantData,
     status: "pending",
     appliedAt: Timestamp.now()
+  });
+};
+
+export const uploadFile = async (file: File, path: string) => {
+  const storage = getStorage();
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+};
+
+export const sendMessage = async (conversationId: string, text: string) => {
+  if (!auth.currentUser) return;
+
+  const messageData = {
+    text,
+    senderId: auth.currentUser.uid,
+    createdAt: Timestamp.now(),
+  };
+
+  await addDoc(collection(db, "conversations", conversationId, "messages"), messageData);
+  await updateDoc(doc(db, "conversations", conversationId), {
+    lastMessage: text,
+    lastMessageAt: Timestamp.now(),
+  });
+};
+
+export const onMessagesUpdate = (conversationId: string, callback: (messages: any[]) => void) => {
+  const q = query(
+    collection(db, "conversations", conversationId, "messages"),
+    orderBy("createdAt", "asc")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(messages);
   });
 };
 
