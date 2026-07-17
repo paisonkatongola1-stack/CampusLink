@@ -1,14 +1,36 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, LayoutDashboard, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogOut, LayoutDashboard, Sparkles, Sun, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedTheme = (localStorage.getItem('theme') as 'light' | 'dark') || 'dark';
+    setTheme(savedTheme);
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -18,10 +40,14 @@ const Navbar = () => {
   const getDashboardLink = () => {
     if (!profile) return '/dashboard';
     switch (profile.role) {
-      case 'business': return '/business-dashboard';
-      case 'admin': return '/admin-dashboard';
-      case 'landlord': return '/business-dashboard';
-      default: return '/dashboard';
+      case 'business':
+      case 'landlord':
+      case 'employer':
+        return '/business-dashboard';
+      case 'admin':
+        return '/admin-dashboard';
+      default:
+        return '/dashboard';
     }
   };
 
@@ -31,11 +57,12 @@ const Navbar = () => {
     { name: 'Marketplace', path: '/marketplace' },
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },
-    { name: 'Services', path: '/businesses' },
+    { name: 'Businesses', path: '/businesses' },
+    { name: 'AI Assistant', path: '/chat' },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-4 shadow-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-4 shadow-2xl transition-all duration-300">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="text-2xl font-black text-white tracking-tighter italic flex items-center">
           Campus<span className="text-primary italic-none ml-0.5">Link</span>
@@ -54,6 +81,15 @@ const Navbar = () => {
           ))}
 
           <div className="h-4 w-px bg-white/10 mx-2" />
+
+          {/* Theme Toggle Switch */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all duration-300 shadow-md"
+            aria-label="Toggle dark/light theme"
+          >
+            {theme === 'dark' ? <Sun size={16} strokeWidth={2.5} /> : <Moon size={16} strokeWidth={2.5} />}
+          </button>
 
           {user ? (
             <div className="flex items-center space-x-4">
@@ -78,8 +114,15 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile menu button */}
-        <div className="lg:hidden flex items-center">
+        {/* Mobile menu button & Theme toggle */}
+        <div className="lg:hidden flex items-center space-x-2">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all duration-300 mr-2"
+            aria-label="Toggle dark/light theme"
+          >
+            {theme === 'dark' ? <Sun size={16} strokeWidth={2.5} /> : <Moon size={16} strokeWidth={2.5} />}
+          </button>
           <button onClick={() => setIsOpen(!isOpen)} className="text-white p-2">
             {isOpen ? <X size={24} strokeWidth={2.5} /> : <Menu size={24} strokeWidth={2.5} />}
           </button>

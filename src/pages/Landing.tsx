@@ -1,7 +1,40 @@
-import { motion } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Sparkles, Building2, ShoppingBag, Briefcase, Calendar, Cpu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fadeInUp, staggerContainer, float, hoverScale } from '../utils/animations';
+
+const AnimatedCounter = ({ value, duration = 1.5 }: { value: string; duration?: number }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const target = parseInt(value.replace(/\D/g, ''), 10);
+  const suffix = value.replace(/\d/g, '');
+
+  useEffect(() => {
+    if (!isInView) return;
+    let start = 0;
+    const end = target;
+    if (start === end) return;
+
+    const totalMilliseconds = duration * 1000;
+    const incrementTime = Math.max(Math.floor(totalMilliseconds / end), 12);
+
+    const timer = setInterval(() => {
+      start += Math.ceil(end / (totalMilliseconds / incrementTime));
+      if (start >= end) {
+        clearInterval(timer);
+        setCount(end);
+      } else {
+        setCount(start);
+      }
+    }, incrementTime);
+
+    return () => clearInterval(timer);
+  }, [isInView, target, duration]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+};
 
 const Landing = () => {
   const features = [
@@ -36,16 +69,16 @@ const Landing = () => {
 
           <motion.h1
             variants={fadeInUp}
-            className="text-5xl lg:text-8xl font-black leading-[0.9] mb-8 tracking-tighter"
+            className="text-5xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tighter"
           >
-            Connecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 italic">Students</span>, Businesses & Spaces
+            Connecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 italic">Students</span>, Businesses & Accommodation Across Zambia
           </motion.h1>
 
           <motion.p
             variants={fadeInUp}
             className="text-lg text-gray-400 mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
           >
-            Find accommodation, jobs, internships, services, events and opportunities all in one platform designed for the modern Zambian student.
+            Find accommodation, jobs, internships, services, events and opportunities all in one platform.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
@@ -56,7 +89,7 @@ const Landing = () => {
             </Link>
             <Link to="/accommodation">
               <motion.button {...hoverScale} className="px-10 py-5 glass rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center border border-white/10 hover:bg-white/5">
-                Explore Now
+                Explore Opportunities
               </motion.button>
             </Link>
           </motion.div>
@@ -123,7 +156,9 @@ const Landing = () => {
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-4xl font-black text-white mb-2 tracking-tighter">{stat.value}</h3>
+              <h3 className="text-4xl font-black text-white mb-2 tracking-tighter">
+                <AnimatedCounter value={stat.value} />
+              </h3>
               <p className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.2em]">{stat.label}</p>
             </motion.div>
           ))}
