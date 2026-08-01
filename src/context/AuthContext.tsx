@@ -35,10 +35,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const logout = async () => {
+    if (localStorage.getItem('mockUser') === 'true') {
+      localStorage.removeItem('mockUser');
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
     await signOut(auth);
   };
 
   useEffect(() => {
+    if (localStorage.getItem('mockUser') === 'true') {
+      setUser({
+        uid: 'mock-user-id',
+        email: 'chanda.musonda@unza.zm',
+        displayName: 'Chanda Musonda',
+      } as unknown as User);
+      setProfile({
+        uid: 'mock-user-id',
+        email: 'chanda.musonda@unza.zm',
+        displayName: 'Chanda Musonda',
+        role: 'student',
+        university: 'UNZA',
+        course: 'Computer Science'
+      });
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
