@@ -24,6 +24,10 @@ export const createUserProfile = async (userId: string, data: Partial<UserProfil
   return await setDoc(doc(db, "users", userId), data);
 };
 
+export const updateUserProfile = async (userId: string, data: Partial<UserProfile>) => {
+  return await updateDoc(doc(db, "users", userId), data);
+};
+
 export const getAccommodations = async (): Promise<AccommodationListing[]> => {
   try {
     const querySnapshot = await getDocs(collection(db, "accommodation"));
