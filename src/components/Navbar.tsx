@@ -18,10 +18,14 @@ const Navbar = () => {
   const getDashboardLink = () => {
     if (!profile) return '/dashboard';
     switch (profile.role) {
-      case 'business': return '/business-dashboard';
-      case 'admin': return '/admin-dashboard';
-      case 'landlord': return '/business-dashboard';
-      default: return '/dashboard';
+      case 'business':
+      case 'landlord':
+      case 'employer':
+        return '/business-dashboard';
+      case 'admin':
+        return '/admin-dashboard';
+      default:
+        return '/dashboard';
     }
   };
 
