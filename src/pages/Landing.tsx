@@ -38,14 +38,14 @@ const Landing = () => {
             variants={fadeInUp}
             className="text-5xl lg:text-8xl font-black leading-[0.9] mb-8 tracking-tighter"
           >
-            Connecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 italic">Students</span>, Businesses & Spaces
+            Connecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 italic">Students</span>, Businesses & Accommodation Across Zambia
           </motion.h1>
 
           <motion.p
             variants={fadeInUp}
             className="text-lg text-gray-400 mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
           >
-            Find accommodation, jobs, internships, services, events and opportunities all in one platform designed for the modern Zambian student.
+            Find accommodation, jobs, internships, services, events and opportunities all in one platform.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
@@ -56,7 +56,7 @@ const Landing = () => {
             </Link>
             <Link to="/accommodation">
               <motion.button {...hoverScale} className="px-10 py-5 glass rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center border border-white/10 hover:bg-white/5">
-                Explore Now
+                Explore Opportunities
               </motion.button>
             </Link>
           </motion.div>
@@ -110,11 +110,11 @@ const Landing = () => {
       <section className="w-full bg-[#05060B] py-24 px-6 border-y border-white/5">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-12 text-center">
           {[
-            { label: "Verified Students", value: "5000+" },
-            { label: "Active Businesses", value: "500+" },
-            { label: "Room Listings", value: "2000+" },
+            { label: "Students", value: "5000+" },
+            { label: "Businesses", value: "500+" },
+            { label: "Accommodation Listings", value: "2000+" },
             { label: "Jobs Posted", value: "1000+" },
-            { label: "Events Monthly", value: "50+" },
+            { label: "Campus Events", value: "50+" },
           ].map((stat, i) => (
             <motion.div
               key={i}
