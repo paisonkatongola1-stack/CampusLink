@@ -39,6 +39,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('mockUser') === 'true') {
+      setUser({
+        uid: 'mock-student-id',
+        email: 'chanda@unza.zm',
+        displayName: 'Chanda Musonda',
+      } as any);
+      setProfile({
+        uid: 'mock-student-id',
+        email: 'chanda@unza.zm',
+        displayName: 'Chanda Musonda',
+        role: 'student',
+        university: 'University of Zambia (UNZA)',
+        course: 'Bachelor of Computer Science'
+      });
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
