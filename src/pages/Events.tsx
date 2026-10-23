@@ -13,7 +13,7 @@ const Events = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-extrabold mb-4 tracking-tighter italic">Events <span className="text-primary italic-none">Hub</span></h1>
+        <h1 className="text-5xl font-extrabold mb-4 tracking-tighter italic">Events <span className="text-primary not-italic">Hub</span></h1>
         <p className="text-gray-400 max-w-2xl mx-auto font-medium uppercase tracking-widest text-[10px]">Discover and participate in the biggest campus events, workshops, and networking sessions across Zambia.</p>
       </div>
 

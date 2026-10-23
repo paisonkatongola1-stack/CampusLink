@@ -58,7 +58,7 @@ export default function Login() {
                         <motion.div variants={fadeInUp} className="inline-flex p-3 bg-primary/10 text-primary rounded-2xl mb-6 shadow-xl shadow-primary/5">
                            <Sparkles size={28} strokeWidth={2.5} />
                         </motion.div>
-                        <motion.h2 variants={fadeInUp} className="text-4xl font-black mb-3 tracking-tight italic">Welcome <span className="text-primary italic-none">Back</span></motion.h2>
+                        <motion.h2 variants={fadeInUp} className="text-4xl font-black mb-3 tracking-tight italic">Welcome <span className="text-primary not-italic">Back</span></motion.h2>
                         <motion.p variants={fadeInUp} transition={{ delay: 0.1 }} className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em]">Access your student portal</motion.p>
                     </div>
 

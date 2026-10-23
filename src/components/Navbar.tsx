@@ -31,14 +31,15 @@ const Navbar = () => {
     { name: 'Marketplace', path: '/marketplace' },
     { name: 'Jobs', path: '/jobs' },
     { name: 'Events', path: '/events' },
-    { name: 'Services', path: '/businesses' },
+    { name: 'Businesses', path: '/businesses' },
+    { name: 'AI Assistant', path: '/chat' },
   ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-4 shadow-2xl">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="text-2xl font-black text-white tracking-tighter italic flex items-center">
-          Campus<span className="text-primary italic-none ml-0.5">Link</span>
+          Campus<span className="text-primary not-italic ml-0.5">Link</span>
         </Link>
 
         {/* Desktop Menu */}
