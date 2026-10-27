@@ -42,7 +42,11 @@ export default function Signup() {
                 createdAt: new Date()
             });
 
-            navigate("/dashboard");
+            if (role === 'business' || role === 'landlord' || role === 'employer') {
+                navigate("/business-dashboard");
+            } else {
+                navigate("/dashboard");
+            }
         } catch (error: any) {
             setError(error.message);
         } finally {

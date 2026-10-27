@@ -180,7 +180,7 @@ const Landing = () => {
       <footer className="w-full border-t border-white/5 py-16 px-6 bg-[#05060B]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="text-2xl font-black mb-6 md:mb-0 tracking-tighter italic">
-            Campus<span className="text-primary italic-none">Link</span>
+            Campus<span className="text-primary not-italic">Link</span>
           </div>
           <div className="text-gray-500 text-xs font-bold uppercase tracking-widest">
             © 2026 CampusLink Zambia • Built for the next generation

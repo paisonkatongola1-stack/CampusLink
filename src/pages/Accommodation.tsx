@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap } from 'lucide-react';
+import { Search, Filter, MapPin, Wind, Wifi, ShieldCheck, Zap, Navigation, Map } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -9,6 +10,8 @@ import { fadeInUp, staggerContainer } from '../utils/animations';
 
 const Accommodation = () => {
   const { data } = useCollection<AccommodationListing>('accommodation');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const mockListings: AccommodationListing[] = [
     {
@@ -33,11 +36,42 @@ const Accommodation = () => {
       landlordId: 'l2',
       university: 'CBU'
     },
+    {
+      id: '3',
+      title: "Mulungushi Great North Rooms",
+      price: "K2,500",
+      distance: "800m from Mulungushi",
+      location: "Kabwe",
+      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+      amenities: ['wifi', 'power', 'water', 'security'],
+      landlordId: 'l3',
+      university: 'Mulungushi'
+    },
   ];
 
-  const listings = data.length > 0 ? data : mockListings;
+  const rawListings = data.length > 0 ? data : mockListings;
 
-  const amenityIcons: any = {
+  const filteredListings = rawListings.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.university.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Under K3,000') {
+      const numericPrice = parseInt(item.price.replace(/[^0-9]/g, ''), 10);
+      return numericPrice < 3000;
+    }
+    if (activeFilter === 'UNZA Area') return item.university === 'UNZA' || item.distance.includes('UNZA');
+    if (activeFilter === 'CBU Area') return item.university === 'CBU' || item.distance.includes('CBU');
+    if (activeFilter === 'Mulungushi') return item.university === 'Mulungushi' || item.distance.includes('Mulungushi');
+    if (activeFilter === 'Self-contained') return item.amenities.includes('wifi') && item.amenities.includes('security');
+
+    return true;
+  });
+
+  const amenityIcons: Record<string, React.ReactNode> = {
     wifi: <Wifi size={14} strokeWidth={2.5} />,
     power: <Zap size={14} strokeWidth={2.5} />,
     security: <ShieldCheck size={14} strokeWidth={2.5} />,
@@ -59,6 +93,8 @@ const Accommodation = () => {
            <Input
              placeholder="Search location or university..."
              icon={<Search size={20} strokeWidth={2.5} />}
+             value={searchQuery}
+             onChange={(e) => setSearchQuery(e.target.value)}
              className="md:w-80 shadow-2xl"
            />
            <Button variant="glass" className="p-3.5">
@@ -68,18 +104,49 @@ const Accommodation = () => {
       </div>
 
       <motion.div variants={fadeInUp} className="flex space-x-3 mb-10 overflow-x-auto pb-4 no-scrollbar">
-        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter, i) => (
-          <button key={i} className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'}`}>
+        {['All', 'Under K3,000', 'UNZA Area', 'CBU Area', 'Mulungushi', 'Self-contained'].map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-6 py-2.5 rounded-2xl whitespace-nowrap border text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+              activeFilter === filter
+                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                : 'glass border-white/5 text-gray-500 hover:text-white hover:border-primary/40'
+            }`}
+          >
             {filter}
           </button>
         ))}
+      </motion.div>
+
+      {/* Decorative Glassmorphism Map Integration Placeholder */}
+      <motion.div variants={fadeInUp} className="mb-12">
+        <Card className="p-8 relative overflow-hidden bg-gradient-to-r from-primary/10 via-white/5 to-primary/5 border border-white/10" hoverable={false}>
+          <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+            <div className="flex items-center space-x-6">
+              <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary shadow-xl border border-primary/30">
+                <Navigation size={28} strokeWidth={2.5} className="animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <Map size={16} className="text-primary" />
+                  <h3 className="text-lg font-black tracking-tight uppercase">Interactive Campus Housing Map</h3>
+                </div>
+                <p className="text-xs text-gray-400 font-medium mt-1">Explore verified hostels and distance radius around UNZA, CBU, and Mulungushi</p>
+              </div>
+            </div>
+            <Button variant="primary" size="md" className="px-6 text-[10px] uppercase font-black tracking-[0.2em]">
+              Open Map View
+            </Button>
+          </div>
+        </Card>
       </motion.div>
 
       <motion.div
         variants={staggerContainer}
         className="grid md:grid-cols-2 lg:grid-cols-3 gap-10"
       >
-        {listings.map((item, i) => (
+        {filteredListings.map((item) => (
           <motion.div
             key={item.id}
             variants={fadeInUp}

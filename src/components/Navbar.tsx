@@ -18,10 +18,14 @@ const Navbar = () => {
   const getDashboardLink = () => {
     if (!profile) return '/dashboard';
     switch (profile.role) {
-      case 'business': return '/business-dashboard';
-      case 'admin': return '/admin-dashboard';
-      case 'landlord': return '/business-dashboard';
-      default: return '/dashboard';
+      case 'business':
+      case 'landlord':
+      case 'employer':
+        return '/business-dashboard';
+      case 'admin':
+        return '/admin-dashboard';
+      default:
+        return '/dashboard';
     }
   };
 
@@ -38,12 +42,20 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5 px-6 py-4 shadow-2xl">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="text-2xl font-black text-white tracking-tighter italic flex items-center">
-          Campus<span className="text-primary italic-none ml-0.5">Link</span>
+          Campus<span className="text-primary not-italic ml-0.5">Link</span>
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex space-x-6 items-center font-bold">
-          {navLinks.map((link) => (
+          {[
+            { name: 'Home', path: '/' },
+            { name: 'Accommodation', path: '/accommodation' },
+            { name: 'Marketplace', path: '/marketplace' },
+            { name: 'Jobs', path: '/jobs' },
+            { name: 'Events', path: '/events' },
+            { name: 'Businesses', path: '/businesses' },
+            { name: 'AI Assistant', path: '/chat' },
+          ].map((link) => (
             <NavLink
               key={link.name}
               to={link.path}
@@ -95,7 +107,15 @@ const Navbar = () => {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden absolute top-full left-0 right-0 glass border-b border-white/10 p-8 flex flex-col space-y-6 shadow-2xl overflow-hidden"
           >
-            {navLinks.map((link) => (
+            {[
+              { name: 'Home', path: '/' },
+              { name: 'Accommodation', path: '/accommodation' },
+              { name: 'Marketplace', path: '/marketplace' },
+              { name: 'Jobs', path: '/jobs' },
+              { name: 'Events', path: '/events' },
+              { name: 'Businesses', path: '/businesses' },
+              { name: 'AI Assistant', path: '/chat' },
+            ].map((link) => (
               <Link key={link.name} to={link.path} onClick={() => setIsOpen(false)} className="text-sm font-black uppercase tracking-[0.3em]">{link.name}</Link>
             ))}
             <hr className="border-white/5" />
