@@ -42,6 +42,14 @@ export const postMarketplaceItem = async (data: Partial<MarketplaceItem>) => {
   });
 };
 
+export const saveItem = async (collectionName: string, data: any) => {
+  return await addDoc(collection(db, collectionName), {
+    ...data,
+    userId: auth.currentUser?.uid,
+    createdAt: Timestamp.now()
+  });
+};
+
 export const applyForJob = async (jobId: string, applicantData: any) => {
   return await addDoc(collection(db, "applications"), {
     jobId,
