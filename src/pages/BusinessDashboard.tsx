@@ -38,7 +38,7 @@ const BusinessDashboard = () => {
       <main className="flex-1 p-6 lg:p-10">
         <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
           <motion.div variants={fadeInUp}>
-            <h1 className="text-3xl font-black tracking-tight uppercase italic">Business <span className="text-primary italic-none">Hub</span></h1>
+            <h1 className="text-3xl font-black tracking-tight uppercase italic">Business <span className="text-primary not-italic">Hub</span></h1>
             <p className="text-gray-500 font-black uppercase tracking-[0.2em] text-[10px]">Manage your ecosystem presence</p>
           </motion.div>
           <motion.button {...hoverScale} className="flex items-center px-8 py-4 bg-primary rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">
