@@ -5,12 +5,12 @@ import { fadeInUp, staggerContainer, float, hoverScale } from '../utils/animatio
 
 const Landing = () => {
   const features = [
-    { icon: <ShoppingBag size={24} strokeWidth={2.5} />, title: "Student Marketplace", desc: "Buy and sell laptops, books, furniture and more." },
+    { icon: <ShoppingBag size={24} strokeWidth={2.5} />, title: "Student Marketplace", desc: "Buy and sell laptops, books, furniture, electronics and more." },
     { icon: <Building2 size={24} strokeWidth={2.5} />, title: "Accommodation Finder", desc: "Find trusted rooms and boarding houses near campus." },
-    { icon: <Briefcase size={24} strokeWidth={2.5} />, title: "Job Hub", desc: "Discover internships and student jobs across Zambia." },
+    { icon: <Briefcase size={24} strokeWidth={2.5} />, title: "Job Hub", desc: "Discover internships and student jobs." },
     { icon: <Building2 size={24} strokeWidth={2.5} />, title: "Business Directory", desc: "Connect with student-friendly businesses." },
     { icon: <Calendar size={24} strokeWidth={2.5} />, title: "Events Hub", desc: "Discover campus events and networking opportunities." },
-    { icon: <Cpu size={24} strokeWidth={2.5} />, title: "AI Assistant", desc: "Study support, career guidance and recommendations." },
+    { icon: <Cpu size={24} strokeWidth={2.5} />, title: "AI Assistant", desc: "Study support, career guidance and accommodation recommendations." },
   ];
 
   return (
@@ -38,25 +38,25 @@ const Landing = () => {
             variants={fadeInUp}
             className="text-5xl lg:text-8xl font-black leading-[0.9] mb-8 tracking-tighter"
           >
-            Connecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 italic">Students</span>, Businesses & Spaces
+            Connecting <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 italic">Students</span>, Businesses & Accommodation Across Zambia
           </motion.h1>
 
           <motion.p
             variants={fadeInUp}
             className="text-lg text-gray-400 mb-12 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
           >
-            Find accommodation, jobs, internships, services, events and opportunities all in one platform designed for the modern Zambian student.
+            Find accommodation, jobs, internships, services, events and opportunities all in one platform.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
             <Link to="/signup">
-              <motion.button {...hoverScale} className="px-10 py-5 bg-accent rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center shadow-2xl shadow-accent/20">
+              <motion.button {...hoverScale} className="px-10 py-5 bg-accent rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center shadow-2xl shadow-accent/20 text-white">
                 Get Started <ArrowRight size={18} strokeWidth={2.5} className="ml-2" />
               </motion.button>
             </Link>
-            <Link to="/accommodation">
-              <motion.button {...hoverScale} className="px-10 py-5 glass rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center border border-white/10 hover:bg-white/5">
-                Explore Now
+            <Link to="/jobs">
+              <motion.button {...hoverScale} className="px-10 py-5 glass rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center border border-white/10 hover:bg-white/5 text-white">
+                Explore Opportunities
               </motion.button>
             </Link>
           </motion.div>
@@ -71,36 +71,36 @@ const Landing = () => {
           {/* Floating Cards Mockup */}
           <div className="relative z-10 grid grid-cols-2 gap-6 p-4">
              <motion.div {...float} className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl">
-                <div className="w-12 h-12 bg-primary/20 rounded-2xl mb-4 flex items-center justify-center text-primary"><ShoppingBag size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-20 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-12 bg-white/10 rounded-full" />
+                <div className="w-12 h-12 bg-primary/20 rounded-2xl mb-3 flex items-center justify-center text-primary"><ShoppingBag size={24} strokeWidth={2.5} /></div>
+                <div className="text-xs font-bold text-white mb-1">Student Marketplace</div>
+                <div className="text-[10px] text-gray-400 font-medium">Laptops, Books & Essentials</div>
              </motion.div>
              <motion.div
                animate={{ y: [0, 15, 0] }}
                transition={{ repeat: Infinity, duration: 4, delay: 0.5, ease: "easeInOut" }}
                className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl mt-16"
              >
-                <div className="w-12 h-12 bg-accent/20 rounded-2xl mb-4 flex items-center justify-center text-accent"><Briefcase size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-16 bg-white/10 rounded-full" />
+                <div className="w-12 h-12 bg-accent/20 rounded-2xl mb-3 flex items-center justify-center text-accent"><Briefcase size={24} strokeWidth={2.5} /></div>
+                <div className="text-xs font-bold text-white mb-1">Jobs & Internships</div>
+                <div className="text-[10px] text-gray-400 font-medium">1000+ Student Openings</div>
              </motion.div>
              <motion.div
                animate={{ y: [0, -15, 0] }}
                transition={{ repeat: Infinity, duration: 5, delay: 1, ease: "easeInOut" }}
                className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl -mt-8"
              >
-                <div className="w-12 h-12 bg-blue-500/20 rounded-2xl mb-4 flex items-center justify-center text-blue-500"><Building2 size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-20 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-12 bg-white/10 rounded-full" />
+                <div className="w-12 h-12 bg-blue-500/20 rounded-2xl mb-3 flex items-center justify-center text-blue-500"><Building2 size={24} strokeWidth={2.5} /></div>
+                <div className="text-xs font-bold text-white mb-1">Accommodation</div>
+                <div className="text-[10px] text-gray-400 font-medium">UNZA, CBU & More</div>
              </motion.div>
              <motion.div
                animate={{ y: [0, 20, 0] }}
                transition={{ repeat: Infinity, duration: 3.5, delay: 0.2, ease: "easeInOut" }}
                className="glass p-5 rounded-[2rem] border border-white/10 shadow-2xl mt-8"
              >
-                <div className="w-12 h-12 bg-purple-500/20 rounded-2xl mb-4 flex items-center justify-center text-purple-500"><Calendar size={24} strokeWidth={2.5} /></div>
-                <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-                <div className="h-2 w-16 bg-white/10 rounded-full" />
+                <div className="w-12 h-12 bg-purple-500/20 rounded-2xl mb-3 flex items-center justify-center text-purple-500"><Calendar size={24} strokeWidth={2.5} /></div>
+                <div className="text-xs font-bold text-white mb-1">Campus Networking</div>
+                <div className="text-[10px] text-gray-400 font-medium">50+ Events & Meetups</div>
              </motion.div>
           </div>
         </motion.div>
@@ -110,11 +110,11 @@ const Landing = () => {
       <section className="w-full bg-[#05060B] py-24 px-6 border-y border-white/5">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-12 text-center">
           {[
-            { label: "Verified Students", value: "5000+" },
-            { label: "Active Businesses", value: "500+" },
-            { label: "Room Listings", value: "2000+" },
+            { label: "Students", value: "5000+" },
+            { label: "Businesses", value: "500+" },
+            { label: "Accommodation Listings", value: "2000+" },
             { label: "Jobs Posted", value: "1000+" },
-            { label: "Events Monthly", value: "50+" },
+            { label: "Campus Events", value: "50+" },
           ].map((stat, i) => (
             <motion.div
               key={i}
