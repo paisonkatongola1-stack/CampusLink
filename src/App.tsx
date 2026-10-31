@@ -55,7 +55,7 @@ function App() {
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
                 <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
-                <Route path="/business-dashboard" element={<ProtectedRoute allowedRoles={['business']}><BusinessDashboard /></ProtectedRoute>} />
+                <Route path="/business-dashboard" element={<ProtectedRoute allowedRoles={['business', 'landlord', 'employer']}><BusinessDashboard /></ProtectedRoute>} />
                 <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />

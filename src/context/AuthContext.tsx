@@ -35,22 +35,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const logout = async () => {
-    await signOut(auth);
+    localStorage.removeItem('mockUser');
+    localStorage.removeItem('mockRole');
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.log('Signed out');
+    }
+    setUser(null);
+    setProfile(null);
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
+    // Check for offline/demo mock login
+    const isMock = localStorage.getItem('mockUser') === 'true';
+    if (isMock) {
+      const mockRole = (localStorage.getItem('mockRole') || 'student') as any;
+      setUser({
+        uid: 'mock-student-id',
+        email: 'chanda.musonda@unza.zm',
+        displayName: 'Chanda Musonda',
+      } as User);
+      setProfile({
+        uid: 'mock-student-id',
+        email: 'chanda.musonda@unza.zm',
+        displayName: 'Chanda Musonda',
+        role: mockRole,
+        university: 'University of Zambia (UNZA)',
+        course: 'Bachelor of Computer Science'
+      });
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      if (firebaseUser) {
         try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             setProfile(userDoc.data() as UserProfile);
           } else {
             setProfile({
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
               role: 'student'
             });
           }

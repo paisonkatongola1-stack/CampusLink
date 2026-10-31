@@ -91,62 +91,128 @@ const StudentDashboard = () => {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid md:grid-cols-2 gap-10"
+          className="grid md:grid-cols-2 gap-8 mb-10"
         >
-          {/* Recommended Accommodation */}
-          <motion.div variants={fadeInUp} className="space-y-6">
-            <div className="flex justify-between items-center px-2">
-              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500">Recommended Housing</h3>
-              <Link to="/accommodation" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80">View All</Link>
+          {/* Recommended Rooms */}
+          <motion.div variants={fadeInUp} className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <h3 className="text-sm font-black tracking-tight uppercase text-gray-400">Recommended Rooms</h3>
+              <Link to="/accommodation" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:underline">View All</Link>
             </div>
-            <Card className="p-0 group relative" hoverable={true}>
+            <Card className="p-0 group relative overflow-hidden" hoverable={true}>
               <div className="aspect-video bg-white/5 overflow-hidden relative">
                 <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Room" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                <div className="absolute top-6 left-6 bg-black/50 backdrop-blur-xl px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/10">UNZA Area</div>
+                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-xl px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/10">UNZA Area</div>
               </div>
-              <div className="p-8 flex justify-between items-center bg-gradient-to-b from-transparent to-black/20">
+              <div className="p-6 flex justify-between items-center bg-gradient-to-b from-transparent to-black/20">
                 <div>
-                  <h4 className="font-bold text-lg tracking-tight">Silverest Executive Lodge</h4>
-                  <div className="flex items-center text-gray-400 text-[10px] mt-2 font-black uppercase tracking-widest">
-                    <MapPin size={12} strokeWidth={2.5} className="mr-2 text-primary" /> 500m from UNZA
+                  <h4 className="font-bold text-base tracking-tight text-white">Silverest Executive Lodge</h4>
+                  <div className="flex items-center text-gray-400 text-[10px] mt-1 font-bold">
+                    <MapPin size={12} strokeWidth={2.5} className="mr-1 text-primary" /> 500m from UNZA
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-primary font-black text-xl">K3,500</div>
-                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Per Month</div>
+                  <div className="text-primary font-black text-lg">K3,500</div>
+                  <div className="text-[9px] font-bold text-gray-500 uppercase">Per Month</div>
                 </div>
               </div>
             </Card>
           </motion.div>
 
-          {/* Latest Internships */}
-          <motion.div variants={fadeInUp} className="space-y-6">
-            <div className="flex justify-between items-center px-2">
-              <h3 className="text-xl font-black tracking-tight uppercase text-[12px] text-gray-500">Latest Internships</h3>
-              <Link to="/jobs" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-80">View All</Link>
+          {/* New Jobs */}
+          <motion.div variants={fadeInUp} className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <h3 className="text-sm font-black tracking-tight uppercase text-gray-400">New Jobs</h3>
+              <Link to="/jobs" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:underline">View All</Link>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
                {[
-                 { role: "Software Dev Intern", company: "Zambia Tech Hub", pay: "K4,000", color: "bg-blue-500/20 text-blue-500" },
-                 { role: "Marketing Assistant", company: "Zed Media Group", pay: "Part-time", color: "bg-accent/20 text-accent" }
+                 { role: "Software Dev Intern", company: "Zambia Tech Hub", pay: "K4,000/mo", type: "Internship" },
+                 { role: "Marketing Assistant", company: "Zed Media Group", pay: "K2,500/mo", type: "Part-time" }
                ].map((job, i) => (
-                 <motion.div key={i} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                   <Card className="p-6 flex items-center space-x-6">
-                     <div className={`w-14 h-14 ${job.color} rounded-2xl flex items-center justify-center font-black text-2xl border border-white/5 shadow-xl`}>
-                       {job.company.charAt(0)}
-                     </div>
-                     <div className="flex-1">
-                       <h4 className="font-bold text-base tracking-tight">{job.role}</h4>
-                       <p className="text-gray-500 text-[10px] font-black uppercase tracking-widest mt-1">{job.company}</p>
+                 <motion.div key={i} whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
+                   <Card className="p-5 flex items-center justify-between border-white/5 bg-white/2 hover:bg-white/5 transition-all">
+                     <div className="flex items-center space-x-4">
+                       <div className="w-12 h-12 bg-primary/20 text-primary rounded-xl flex items-center justify-center font-black text-lg border border-white/5">
+                         {job.company.charAt(0)}
+                       </div>
+                       <div>
+                         <h4 className="font-bold text-sm tracking-tight text-white">{job.role}</h4>
+                         <p className="text-gray-400 text-[10px] font-bold uppercase mt-0.5">{job.company} • {job.type}</p>
+                       </div>
                      </div>
                      <div className="text-right">
-                       <div className="text-xs font-black text-white">{job.pay}</div>
-                       <button className="text-[9px] text-primary hover:text-white uppercase font-black tracking-[0.2em] mt-2 transition-colors">Details</button>
+                       <div className="text-xs font-black text-primary">{job.pay}</div>
+                       <Link to="/jobs" className="text-[9px] text-gray-400 hover:text-white uppercase font-black tracking-widest mt-1 block">Apply</Link>
                      </div>
                    </Card>
                  </motion.div>
                ))}
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Marketplace Listings & Upcoming Events */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid md:grid-cols-2 gap-8"
+        >
+          {/* Marketplace Listings */}
+          <motion.div variants={fadeInUp} className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <h3 className="text-sm font-black tracking-tight uppercase text-gray-400">Marketplace Listings</h3>
+              <Link to="/marketplace" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:underline">View All</Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { title: "MacBook Pro M1", price: "K15,000", campus: "UNZA", img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80" },
+                { title: "Calculus 9th Ed", price: "K450", campus: "CBU", img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80" }
+              ].map((item, i) => (
+                <Card key={i} className="p-0 overflow-hidden group border-white/5" hoverable={true}>
+                  <div className="h-32 bg-white/5 overflow-hidden">
+                    <img src={item.img} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt={item.title} />
+                  </div>
+                  <div className="p-4">
+                    <h5 className="font-bold text-xs truncate text-white">{item.title}</h5>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-primary font-black text-xs">{item.price}</span>
+                      <span className="text-[9px] text-gray-500 font-bold uppercase">{item.campus}</span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Upcoming Events */}
+          <motion.div variants={fadeInUp} className="space-y-4">
+            <div className="flex justify-between items-center px-1">
+              <h3 className="text-sm font-black tracking-tight uppercase text-gray-400">Upcoming Events</h3>
+              <Link to="/events" className="text-primary text-[10px] font-black uppercase tracking-[0.2em] hover:underline">View All</Link>
+            </div>
+            <div className="space-y-3">
+              {[
+                { title: "Zambia Tech Expo 2026", date: "Oct 24, 2026", venue: "UNZA Main Hall" },
+                { title: "Entrepreneurship Summit", date: "Nov 05, 2026", venue: "Mulungushi Conference" }
+              ].map((ev, i) => (
+                <Card key={i} className="p-4 flex items-center justify-between border-white/5 bg-white/2 hover:bg-white/5 transition-all">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-purple-500/20 text-purple-400 rounded-xl">
+                      <Calendar size={18} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xs text-white">{ev.title}</h4>
+                      <p className="text-[10px] text-gray-400 font-medium">{ev.venue} • {ev.date}</p>
+                    </div>
+                  </div>
+                  <Link to="/events">
+                    <Button variant="glass" size="sm" className="text-[9px] font-black uppercase px-3 py-1.5">View</Button>
+                  </Link>
+                </Card>
+              ))}
             </div>
           </motion.div>
         </motion.div>
