@@ -1,14 +1,36 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, Users, Layout, Activity,
   CheckCircle, AlertCircle, TrendingUp, DollarSign,
-  ArrowUpRight, Settings
+  ArrowUpRight, Settings, Trash2, Check, X
 } from 'lucide-react';
+import { useState } from 'react';
 import { fadeInUp, staggerContainer, scaleUp } from '../utils/animations';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
 const AdminDashboard = () => {
+  const [selectedTab, setSelectedTab] = useState<'Accommodation' | 'Marketplace' | 'Events' | 'Businesses'>('Accommodation');
+
+  const [pendingItems, setPendingItems] = useState([
+    { id: 1, title: "Riverside Shared Room (K2,200)", user: "Landlord: John B.", category: "Accommodation", campus: "CBU" },
+    { id: 2, title: "Silverest Self-Contained Flat", user: "Landlord: Alice M.", category: "Accommodation", campus: "UNZA" },
+    { id: 3, title: "HP Laptop G8 Pro (K7,500)", user: "Student: Mwaka M.", category: "Marketplace", campus: "UNZA" },
+    { id: 4, title: "Economics Textbooks Bundle", user: "Student: Bwalya C.", category: "Marketplace", campus: "Mulungushi" },
+    { id: 5, title: "Zambia Tech Expo 2026", user: "Organizer: ICT Union", category: "Events", campus: "UNZA" },
+    { id: 6, title: "Zed Print Hub & Binding", user: "Business: Patrick N.", category: "Businesses", campus: "Lusaka" },
+  ]);
+
+  const handleApprove = (id: number) => {
+    setPendingItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleReject = (id: number) => {
+    setPendingItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const filteredPending = pendingItems.filter(item => item.category === selectedTab);
+
   const stats = [
     { label: "Total Users", val: "10,248", icon: <Users size={24} strokeWidth={2.5} />, color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Total Listings", val: "1,245", icon: <Layout size={24} strokeWidth={2.5} />, color: "text-purple-500", bg: "bg-purple-500/10" },
@@ -65,30 +87,52 @@ const AdminDashboard = () => {
               </h3>
               <div className="glass overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl relative">
                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
-                 <div className="flex border-b border-white/5 bg-white/2">
-                    {['Accommodation', 'Marketplace', 'Events'].map((tab, i) => (
-                      <button key={tab} className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${i === 0 ? 'bg-primary/10 text-primary border-b-2 border-primary' : 'text-gray-600 hover:text-white'}`}>
+                 <div className="flex border-b border-white/5 bg-white/2 overflow-x-auto no-scrollbar">
+                    {(['Accommodation', 'Marketplace', 'Events', 'Businesses'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setSelectedTab(tab)}
+                        className={`flex-1 py-4 px-3 text-[10px] font-black uppercase tracking-[0.15em] whitespace-nowrap transition-all ${
+                          selectedTab === tab
+                            ? 'bg-primary/20 text-primary border-b-2 border-primary'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
                         {tab}
                       </button>
                     ))}
                  </div>
-                 <div className="p-8 space-y-6">
-                    {[
-                      { title: "Riverside Shared Room", user: "Landlord: John B.", type: "New Listing" },
-                      { title: "Zambia Tech Expo", user: "Organizer: ICT Union", type: "Event" },
-                      { title: "HP Laptop G8 Pro", user: "Student: Mwaka M.", type: "Marketplace" }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-5 bg-white/3 rounded-[1.5rem] border border-white/5 hover:border-primary/20 transition-all group">
-                        <div>
-                          <div className="font-bold text-sm tracking-tight group-hover:text-primary transition-colors">{item.title}</div>
-                          <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">{item.user}</div>
-                        </div>
-                        <div className="flex space-x-3">
-                           <button className="p-3 bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/10"><CheckCircle size={18} strokeWidth={2.5} /></button>
-                           <button className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/10"><AlertCircle size={18} strokeWidth={2.5} /></button>
-                        </div>
+                 <div className="p-6 space-y-4">
+                    {filteredPending.length === 0 ? (
+                      <div className="text-center py-10 text-gray-400 text-xs font-bold">
+                        No pending items in {selectedTab}. All caught up!
                       </div>
-                    ))}
+                    ) : (
+                      filteredPending.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-4 bg-white/3 rounded-2xl border border-white/5 hover:border-primary/20 transition-all">
+                          <div>
+                            <div className="font-bold text-xs tracking-tight text-white">{item.title}</div>
+                            <div className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">{item.user} • {item.campus}</div>
+                          </div>
+                          <div className="flex space-x-2">
+                             <button
+                               onClick={() => handleApprove(item.id)}
+                               className="p-2.5 bg-green-500/20 text-green-400 rounded-xl hover:bg-green-500 hover:text-white transition-all"
+                               title="Approve Listing"
+                             >
+                               <Check size={16} strokeWidth={3} />
+                             </button>
+                             <button
+                               onClick={() => handleReject(item.id)}
+                               className="p-2.5 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"
+                               title="Reject Listing"
+                             >
+                               <X size={16} strokeWidth={3} />
+                             </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                  </div>
               </div>
            </motion.div>
